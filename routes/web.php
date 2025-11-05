@@ -8,3 +8,6 @@ Route::get('/', function () {
 });
 
 Route::get('tka', [UjianController::class, 'index'])->name('tka.index');
+Route::get('template', function () {
+    return view('template');
+})->name('template');
