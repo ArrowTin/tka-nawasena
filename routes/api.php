@@ -3,11 +3,13 @@
 
 use App\Http\Controllers\Api\{
     CategoryController,
+    EducationLevelController,
     SubjectController,
     QuestionTypeController,
     QuestionController,
     ExamController,
-    StudentController
+    StudentController,
+    SubjectTypeController
 };
 use App\Http\Controllers\Server\ExamStudentController;
 use Illuminate\Support\Facades\Route;
@@ -16,6 +18,9 @@ use Illuminate\Support\Facades\Route;
 // MANAGEMENT (ADMIN/TEACHER)
 // ----------------------
 Route::prefix('management')->middleware('supervisor.jwt')->group(function () {
+
+    Route::apiResource('education-levels', EducationLevelController::class);
+    Route::apiResource('subject-types', SubjectTypeController::class);
     Route::apiResource('categories', CategoryController::class);
     Route::apiResource('subjects', SubjectController::class);
     Route::apiResource('question-types', QuestionTypeController::class);
