@@ -17,7 +17,8 @@ use Illuminate\Support\Facades\Route;
 // ----------------------
 // MANAGEMENT (ADMIN/TEACHER)
 // ----------------------
-Route::prefix('management')->middleware('supervisor.jwt')->group(function () {
+// 'supervisor.jwt'
+Route::prefix('management')->middleware([])->group(function () {
 
     Route::apiResource('education-levels', EducationLevelController::class);
     Route::apiResource('subject-types', SubjectTypeController::class);

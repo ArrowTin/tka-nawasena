@@ -6,15 +6,32 @@ namespace App\Http\Controllers\Api;
 use App\Helpers\ApiResponse;
 use App\Http\Controllers\Controller;
 use App\Models\EducationLevel;
+use App\Services\DataTableBuilder;
 use Illuminate\Http\Request;
 use Illuminate\Validation\Rule;
 
 class EducationLevelController extends Controller
 {
-    public function index()
+    public function index(Request $request)
     {
-        $levels = EducationLevel::with('subjectTypes')->get();
-        return ApiResponse::success($levels);
+        $builder = new DataTableBuilder(
+            EducationLevel::query()->with('subjectTypes')
+        );
+
+
+        $sortBy = $request->sort_by ?? 'id';
+      
+
+        $data = $builder
+            ->multiSearch($request->filters ?? [])
+            ->search(['name'], $request->keyword)
+            ->sort($sortBy, $request->sort_dir ?? 'asc')   
+            ->apply(
+                $request->page ?? 1,
+                $request->per_page ?? 10
+            );                                         
+
+        return ApiResponse::success($data);
     }
 
     public function store(Request $request)
