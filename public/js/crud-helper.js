@@ -45,7 +45,7 @@ window.CRUD = {
                     '${urlFetch}',
                     '${urlPost}',
                     JSON.parse(decodeURIComponent('${selectedSafe}')),
-                    '${title}'
+                    '${title} : ${row.name}'
                 )">
                 <i class="fa-solid fa-plus"></i> Tambah
             </span>

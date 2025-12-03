@@ -12,7 +12,7 @@
 @section('content')
 
 <button class="btn btn-primary mb-3"
-    onclick="openCreateModal(apiUrl.store)">
+    onclick="resetModalCreate(); openCreateModal(apiUrl.store)">
     <i class="fa-solid fa-plus"></i> Tambah Jenis Mata Pelajaran
 </button>
 
@@ -24,6 +24,7 @@
     :fields="[
         ['type' => 'text', 'label' => 'Nama Tingkat', 'name' => 'name', 'col' => 12],
     ]"
+    :relations="['educationLevels']"
 />
 
 <x-dynamic-datatable 
@@ -59,8 +60,20 @@
         const columns = [
             { data: 'id' },
             { data: 'name' },
-            { data: 'educationLevels.name', render: CRUD.listNames },
-
+            {
+                data: 'education_levels',
+                orderable: false, 
+                render: function (data, type, row) {
+                    return CRUD.listNames(
+                        'educationLevels',
+                        data,
+                        type,
+                        row,
+                        apiUrl,
+                        'Tambah Tingkat Sekolah'
+                    );
+                }
+            },
             // searchable hidden column
             {
                 data: 'educationLevels',

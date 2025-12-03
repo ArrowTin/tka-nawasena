@@ -23,6 +23,8 @@ Route::prefix('management')->middleware([])->group(function () {
     Route::get('education-levels/subject-types', [EducationLevelController::class,'subjectTypes']);
     Route::post('education-levels/{id}/add-subject-types', [EducationLevelController::class,'addSubjectType']);
     Route::apiResource('education-levels', EducationLevelController::class);
+    Route::get('subject-types/education-levels', [SubjectTypeController::class,'educationLevels']);
+    Route::post('subject-types/{id}/add-education-levels', [SubjectTypeController::class,'addeducationLevels']);
     Route::apiResource('subject-types', SubjectTypeController::class);
     Route::apiResource('categories', CategoryController::class);
     Route::apiResource('subjects', SubjectController::class);

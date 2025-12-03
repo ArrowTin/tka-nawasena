@@ -1,6 +1,23 @@
 {
     "menu": [
         {
+            "name": "Pengaturan",
+            "icon": "menu-icon icon-base ti tabler-settings",
+            "slug": "su",
+            "submenu": [
+                {
+                    "url": "su/education",
+                    "name": "Tingkat Sekolah",
+                    "slug": "su-education"
+                },
+                {
+                    "url": "su/subject-types",
+                    "name": "Tipe Mata Pelajaran",
+                    "slug": "su-subject-types"
+                }
+            ]
+        },
+        {
             "url": "beranda",
             "name": "Beranda",
             "icon": "menu-icon icon-base ti tabler-smart-home",
