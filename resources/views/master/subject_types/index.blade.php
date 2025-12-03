@@ -1,6 +1,6 @@
 @extends('layouts/layoutMaster')
 
-@section('title', 'Tingkat Sekolah - TKA Nawasena')
+@section('title', 'Jenis Mata Pelajaran - TKA Nawasena')
 
 @section('page-style')
     @vite(['resources/assets/vendor/fonts/fontawesome.scss'])
@@ -12,34 +12,33 @@
 @section('content')
 
 <button class="btn btn-primary mb-3"
-    onclick="resetModalCreate(); openCreateModal(apiUrl.store)">
-    <i class="fa-solid fa-plus"></i> Tambah Tingkat
+    onclick="openCreateModal(apiUrl.store)">
+    <i class="fa-solid fa-plus"></i> Tambah Jenis Mata Pelajaran
 </button>
 
 <x-dynamic-modal 
     id="modalCreate"
-    title="Tambah Tingkat Sekolah"
-    :action="url('/api/management/education-levels')"
-    table="educationLevelTable"
+    title="Tambah Jenis Mata Pelajaran"
+    :action="url('/api/management/subject-types')"
+    table="subjectTypeTable"
     :fields="[
         ['type' => 'text', 'label' => 'Nama Tingkat', 'name' => 'name', 'col' => 12],
     ]"
-    :relations="['subjectTypes']"
 />
 
 <x-dynamic-datatable 
-    title="Tingkat Sekolah"
-    id="educationLevelTable"
-    :api="url('/api/management/education-levels')"
+    title="Jenis Mata Pelajaran"
+    id="subjectTypeTable"
+    :api="url('/api/management/subject-types')"
     :columns="[
         ['data' => 'id', 'title' => 'ID'],
         ['data' => 'name', 'title' => 'Nama'],
-        ['data' => 'subjectTypes', 'title' => 'Jenis Mata Pelajaran', 'render' => 'listNames'],
+        ['data' => 'educationLevels', 'title' => 'Tingkat Sekolah', 'render' => 'listNames'],
         ['data' => 'id', 'title' => 'Aksi', 'render' => 'actionButtons']
     ]"
     :searchable="[
         ['label' => 'Nama', 'column' => 1, 'filter'=>'name'],
-        ['label' => 'Jenis Mata Pelajaran', 'column' => 2, 'filter'=>'subjectTypes.name'],
+        ['label' => 'Tingkat Sekolah', 'column' => 2, 'filter'=>'educationLevels.name'],
     ]"
 />
 
@@ -53,31 +52,18 @@
 
 
 <script>
-    const apiUrl = CRUD.api("{{ url('/api/management/education-levels') }}");
-    
+    const apiUrl = CRUD.api("{{ url('/api/management/subject-types') }}");
+
     document.addEventListener("DOMContentLoaded", () => {
 
         const columns = [
             { data: 'id' },
             { data: 'name' },
-            {
-                data: 'subject_types',
-                orderable: false, 
-                render: function (data, type, row) {
-                    return CRUD.listNames(
-                        'subjectTypes',
-                        data,
-                        type,
-                        row,
-                        apiUrl,
-                        'Tambah Jenis Mata Pelajaran'
-                    );
-                }
-            },
+            { data: 'educationLevels.name', render: CRUD.listNames },
 
             // searchable hidden column
             {
-                data: 'subjectTypes',
+                data: 'educationLevels',
                 visible: false,
                 searchable: true,
                 render: (data) => data ? data.map(s => s.name).join(' ') : ""
@@ -88,13 +74,13 @@
                 data: 'id',
                 orderable: false,
                 render: function(data, type, row) {
-                    row.table = "educationLevelTable"; // penting untuk reload
+                    row.table = "subjectTypeTable"; // penting untuk reload
                     return CRUD.actionButtons(data, type, row, apiUrl);
                 }
             }
         ];
 
-        initDynamicDatatable("educationLevelTable", apiUrl.index, columns);
+        initDynamicDatatable("subjectTypeTable", apiUrl.index, columns);
     });
 </script>
 @endsection

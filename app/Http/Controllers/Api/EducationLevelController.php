@@ -6,6 +6,7 @@ namespace App\Http\Controllers\Api;
 use App\Helpers\ApiResponse;
 use App\Http\Controllers\Controller;
 use App\Models\EducationLevel;
+use App\Models\SubjectType;
 use App\Services\DataTableBuilder;
 use Illuminate\Http\Request;
 use Illuminate\Validation\Rule;
@@ -44,12 +45,32 @@ class EducationLevelController extends Controller
         return ApiResponse::success($level, 'Education level created', 201);
     }
 
+    public function addSubjectType(Request $request,$id) {
+
+        $level = EducationLevel::find($id);
+        if (!$level) return ApiResponse::error('Education level not found', 404);
+
+        $request->validate([
+            'subjectTypes' => 'required|array|min:1',
+            'subjectTypes.*' => 'required|exists:subject_types,id',
+        ]);
+
+        $level->subjectTypes()->sync($request->subjectTypes);
+
+        return ApiResponse::success($level, 'Tipe Mata Pelajaran Perbaharui');
+    }
+
     public function show($id)
     {
         $level = EducationLevel::with('subjectTypes')->find($id);
         if (!$level) return ApiResponse::error('Education level not found', 404);
 
         return ApiResponse::success($level);
+    }
+
+    public function subjectTypes()
+    {
+        return ApiResponse::success(SubjectType::select('id','name')->get());
     }
 
     public function update(Request $request, $id)

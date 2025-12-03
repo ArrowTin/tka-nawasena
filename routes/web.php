@@ -17,4 +17,5 @@ Route::get('template', function () {
 
 Route::prefix('su')->group(function(){
     Route::view('/education','master.education_levels.index');
+    Route::view('/subject-types','master.subject_types.index');
 });

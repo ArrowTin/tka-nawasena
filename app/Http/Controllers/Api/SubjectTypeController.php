@@ -5,15 +5,32 @@ namespace App\Http\Controllers\Api;
 use App\Http\Controllers\Controller;
 use App\Helpers\ApiResponse;
 use App\Models\SubjectType;
+use App\Services\DataTableBuilder;
 use Illuminate\Http\Request;
 use Illuminate\Validation\Rule;
 
 class SubjectTypeController extends Controller
 {
-    public function index()
+    public function index(Request $request)
     {
-        $types = SubjectType::with('educationLevels')->get();
-        return ApiResponse::success($types);
+        $builder = new DataTableBuilder(
+            SubjectType::query()->with('educationLevels')
+        );
+
+
+        $sortBy = $request->sort_by ?? 'id';
+      
+
+        $data = $builder
+            ->multiSearch($request->filters ?? [])
+            ->search(['name'], $request->keyword)
+            ->sort($sortBy, $request->sort_dir ?? 'asc')   
+            ->apply(
+                $request->page ?? 1,
+                $request->per_page ?? 10
+            );                                         
+
+        return ApiResponse::success($data);
     }
 
     public function store(Request $request)

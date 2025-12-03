@@ -20,6 +20,8 @@ use Illuminate\Support\Facades\Route;
 // 'supervisor.jwt'
 Route::prefix('management')->middleware([])->group(function () {
 
+    Route::get('education-levels/subject-types', [EducationLevelController::class,'subjectTypes']);
+    Route::post('education-levels/{id}/add-subject-types', [EducationLevelController::class,'addSubjectType']);
     Route::apiResource('education-levels', EducationLevelController::class);
     Route::apiResource('subject-types', SubjectTypeController::class);
     Route::apiResource('categories', CategoryController::class);
