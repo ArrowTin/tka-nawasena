@@ -135,19 +135,20 @@ class QuestionController extends Controller
             QuestionCorrectAnswer::where('question_id', $question->id)->delete();
         
             $oldToNew = []; // mapping lama → baru
-        
-            foreach ($data['options'] as $opt) {
-        
-                // buat option baru
-                $newOpt = QuestionOption::create([
-                    'question_id' => $question->id,
-                    'option_label' => $opt['label'],
-                    'option_text' => $opt['text'],
-                ]);
-        
-                // simpan mapping id lama → id baru
-                if (isset($opt['id'])) {
-                    $oldToNew[$opt['id']] = $newOpt->id;
+            if (!empty($data['options'])) {
+                foreach ($data['options'] as $opt) {
+            
+                    // buat option baru
+                    $newOpt = QuestionOption::create([
+                        'question_id' => $question->id,
+                        'option_label' => $opt['label'],
+                        'option_text' => $opt['text'],
+                    ]);
+            
+                    // simpan mapping id lama → id baru
+                    if (isset($opt['id'])) {
+                        $oldToNew[$opt['id']] = $newOpt->id;
+                    }
                 }
             }
         

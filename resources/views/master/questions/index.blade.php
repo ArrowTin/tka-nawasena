@@ -111,10 +111,19 @@
             { data: 'subject.name' },
             { data: 'type.name' },
             { data: 'question_text', render: shortText },
-            { data: 'options', render: listOptions },
-            { data: 'options', render: listCorrect },
+            { 
+                data: 'options', 
+                orderable: false,
+                render: listOptions 
+            },
+            { 
+                data: 'options', 
+                orderable: false,
+                render: listCorrect 
+            },
             {
                 data: 'id',
+                orderable: false,
                 render: function(data, type, row) {
                     row.table = "questionTable";
                     return CRUD.actionButtons(data, type, row, apiUrl);

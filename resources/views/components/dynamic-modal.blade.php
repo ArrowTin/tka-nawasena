@@ -109,28 +109,44 @@ data-bs-keyboard="false">
     </div>
   </div>
 </div>
-
 @push('script')
 <script>
-document.addEventListener("DOMContentLoaded", function () {
+document.addEventListener("DOMContentLoaded", () => {
 
 const modalId = "{{ $id }}";
 const modalEl = document.getElementById(modalId);
 const modal = bootstrap.Modal.getOrCreateInstance(modalEl);
 
 /* =====================================================
-   SELECT2 — init
+   SELECT2 INIT
 ===================================================== */
-  function initSelect2() {
-      if (!$.fn.select2) {
-          console.error("Select2 belum terload!");
-          return;
-      }
-      $(`#${modalId} .select2`).select2({
-          dropdownParent: $(`#${modalId}`),
-          width: "100%"
-      });
-  }
+function initSelect2() {
+    if (!$.fn.select2) return console.error("Select2 belum terload!");
+
+    $(`#${modalId} .select2`).select2({
+        dropdownParent: $(`#${modalId}`),
+        width: "100%"
+    });
+}
+
+/* =====================================================
+   TO CAMEL + KEBAB
+   ===================================================== */
+
+   function toCamel(str) {
+    return str.replace(/([-_][a-z])/g, group =>
+        group
+            .toUpperCase()
+            .replace('-', '')
+            .replace('_', '')
+    );
+}
+
+function toKebab(str) {
+    return str
+        .replace(/([a-z0-9])([A-Z])/g, '$1-$2')
+        .toLowerCase();
+}
 
 
 /* =====================================================
@@ -138,21 +154,17 @@ const modal = bootstrap.Modal.getOrCreateInstance(modalEl);
 ===================================================== */
 window.resetModalCreate = function () {
 
-    // tampilkan field normal
+    // tampilkan elemen normal
     document.querySelectorAll(`#${modalId}_form [data-field="normal"]`)
         .forEach(el => el.style.display = "block");
 
-    // sembunyikan field relasi
-    // sembunyikan field relasi TAPI JANGAN HAPUS STRUKTURNYA
-document.querySelectorAll(`#${modalId}_form [data-field="relation"]`)
-    .forEach(el => {
-        el.style.display = "none";
-
-        // HANYA reset optionList jika ada
-        const list = el.querySelector("#optionList");
-        if (list) list.innerHTML = "";
-    });
-
+    // sembunyikan relasi
+    document.querySelectorAll(`#${modalId}_form [data-field="relation"]`)
+        .forEach(el => {
+            el.style.display = "none";
+            const list = el.querySelector("#optionList");
+            if (list) list.innerHTML = "";
+        });
 
     // reset select2
     setTimeout(() => {
@@ -171,36 +183,21 @@ window.openCreateModal = function (url, title = "Tambah Data") {
     document.getElementById(`${modalId}_url`).value = url;
     document.getElementById(`${modalId}_method`).value = "POST";
 
-    const form = document.getElementById(`${modalId}_form`);
-    form.reset();
+    document.getElementById(`${modalId}_form`).reset();
 
-     // tampilkan opsi
-    const wrapOpt = document.getElementById("wrap_options");
-    if (wrapOpt) wrapOpt.style.display = "block";
+    // tampilkan opsi
+    const optWrap = document.getElementById("wrap_options");
+    if (optWrap) optWrap.style.display = "block";
 
-    // ============================================
-    // ⬇️ TAMBAHAN PENTING: default 2 opsi
-    // ============================================
+    // default 2 opsi
     const optionList = document.getElementById("optionList");
     if (optionList) {
         optionList.innerHTML = "";
         addOption();
         addOption();
     }
-    // ============================================
-
-
-    setTimeout(() => {
-        handleTypeChange();
-    }, 200);
-
-
-    // reset Select2
-    $(`#${modalId} .select2`).val("").trigger("change");
 
     modal.show();
-
-    // init select2 setelah modal muncul
     setTimeout(() => initSelect2(), 150);
 };
 
@@ -215,101 +212,97 @@ window.openEditModal = async function (url, title = "Edit Data") {
     document.getElementById(`${modalId}_url`).value = url;
     document.getElementById(`${modalId}_method`).value = "PUT";
 
-    setTimeout(() => {
-        handleTypeChange();
-    }, 200);
+    const res = await fetch(url, { headers: { "Accept": "application/json" }});
+    const json = await res.json();
+    const data = json.payload ?? {};
 
+    /* ===== SET FIELD BIASA ===== */
+    Object.keys(data).forEach(key => {
+        const input = document.querySelector(`#${modalId}_form [name="${key}"]`);
+        if (!input) return;
 
-    const response = await fetch(url, { headers: { "Accept": "application/json" }});
-    const res = await response.json();
-    const data = res.payload ?? {};
+        // ⛔ file input tidak boleh di-set
+        if (input.type === "file") {
+            input.value = "";
+            return;
+        }
 
-    // jika ada opsi
+        input.value = data[key];
+
+        if ($(input).hasClass("select2")) {
+            $(input).trigger("change");
+        }
+    });
+
+    /* ===== SET OPTIONS (JIKA ADA) ===== */
     if (data.options) {
-        document.getElementById("wrap_options").style.display = "block";
+        const wrap = document.getElementById("wrap_options");
+        wrap.style.display = "block";
+
         const correctIds = data.options
             .filter(o => o.correct_answer !== null)
             .map(o => o.id);
 
         fillOptions(data.options, correctIds);
-
     }
 
-
-    // isi field
-    Object.keys(data).forEach(key => {
-        let input = $(`#${modalId}_form [name="${key}"]`);
-
-        if (input.length) {
-            input.val(data[key]);
-
-            // jika select2 → trigger change
-            if (input.hasClass("select2")) {
-                input.trigger("change");
-            }
-        }
-    });
-
     modal.show();
-
-    // init select2
     setTimeout(() => initSelect2(), 150);
 };
 
 /* =====================================================
-   TO CAMEL + KEBAB
-===================================================== */
-function toCamel(str) {
-    return str.replace(/([-_][a-z])/g, group =>
-        group.toUpperCase().replace('-', '').replace('_', '')
-    );
-}
-
-function toKebab(str) {
-    return str
-        .replace(/([a-z0-9])([A-Z])/g, '$1-$2')
-        .toLowerCase();
-}
-
-/* =====================================================
    OPEN RELATION (checkbox)
-===================================================== */
-window.openAddItem = async function(fieldName, fetchUrl, postUrl, selectedItems = [], title = "Pilih Relasi") {
+   ===================================================== */
 
+   window.openAddItem = async function (
+    fieldName,
+    fetchUrl,
+    postUrl,
+    selectedItems = [],
+    title = "Pilih Relasi"
+) {
     resetModalCreate();
 
     document.getElementById(`${modalId}_title`).innerText = title;
     document.getElementById(`${modalId}_url`).value = postUrl;
     document.getElementById(`${modalId}_method`).value = "POST";
 
+    // Sembunyikan field normal
     document.querySelectorAll(`#${modalId}_form [data-field="normal"]`)
         .forEach(el => el.style.display = "none");
 
+    // Wrapper untuk field relasi
     const wrapId = `wrap_${toKebab(fieldName)}`;
     const wrap = document.getElementById(wrapId);
-
     if (!wrap) return;
 
     wrap.style.display = "block";
     wrap.innerHTML = "Loading...";
 
-    const response = await fetch(fetchUrl, { headers: { "Accept": "application/json" }});
-    const res = await response.json();
+    // Fetch data dari server
+    const response = await fetch(fetchUrl, {
+        headers: { "Accept": "application/json" }
+    });
 
+    const res = await response.json();
     const list = res.payload ?? [];
+
     const selected = selectedItems.map(i => Number(i.id));
 
     wrap.innerHTML = "";
 
+    // Generate checkbox list
     list.forEach(row => {
         wrap.innerHTML += `
             <div class="form-check">
                 <input class="form-check-input"
-                      type="checkbox"
-                      name="${fieldName}[]"
-                      value="${row.id}"
-                      ${selected.includes(row.id) ? "checked" : ""}>
-                <label class="form-check-label">${row.name}</label>
+                       type="checkbox"
+                       name="${fieldName}[]"
+                       value="${row.id}"
+                       ${selected.includes(row.id) ? "checked" : ""}>
+                <label class="form-check-label">
+                    ${row.name}
+                </label>
             </div>
         `;
     });
@@ -317,17 +310,20 @@ window.openAddItem = async function(fieldName, fetchUrl, postUrl, selectedItems 
     modal.show();
 };
 
+
+/* =====================================================
+   ADD OPTION INPUT
+===================================================== */
 window.addOption = function(id = null, label = "", text = "", correct = false) {
     const container = document.getElementById("optionList");
     if (!container) return;
 
     const index = container.children.length + 1;
+
     const optionId = id ?? `new-${index}`;
     const labelLetter = label || String.fromCharCode(64 + index);
 
-    container.insertAdjacentHTML(
-        "beforeend",
-        `
+    container.insertAdjacentHTML("beforeend", `
         <div class="border rounded p-2 mb-2 option-item" data-option="${optionId}">
             <div class="row g-2">
 
@@ -335,23 +331,21 @@ window.addOption = function(id = null, label = "", text = "", correct = false) {
 
                 <div class="col-md-2">
                     <label>Label</label>
-                    <input type="text" class="form-control"
-                        name="options[${index}][label]"
-                        value="${labelLetter}">
+                    <input type="text" class="form-control" 
+                        name="options[${index}][label]" value="${labelLetter}">
                 </div>
 
                 <div class="col-md-7">
                     <label>Teks Opsi</label>
                     <input type="text" class="form-control"
-                        name="options[${index}][text]"
-                        value="${text}">
+                        name="options[${index}][text]" value="${text}">
                 </div>
 
                 <div class="col-md-2 d-flex align-items-center">
                     <div class="form-check mt-3">
                         <input type="checkbox" class="form-check-input"
-                            name="correct_option_ids[]" value="${optionId}"
-                            ${correct ? "checked" : ""}>
+                            name="correct_option_ids[]" 
+                            value="${id ?? ''}" ${correct ? "checked" : ""}>
                         <label class="form-check-label ms-1">Benar?</label>
                     </div>
                 </div>
@@ -362,113 +356,104 @@ window.addOption = function(id = null, label = "", text = "", correct = false) {
                         <i class="fa fa-trash"></i>
                     </button>
                 </div>
-
             </div>
-        </div>`
-    );
+        </div>
+    `);
 };
 
-
-
-
-
-    
-    
-// Saat openEditModal memuat data opsi
+/* =====================================================
+   FILL OPTIONS — untuk EDIT
+===================================================== */
 window.fillOptions = function(options = [], correct = []) {
-  const wrap = document.getElementById("optionList");
-  wrap.innerHTML = "";
+    const wrap = document.getElementById("optionList");
+    wrap.innerHTML = "";
 
-  options.forEach((o, idx) => {
-      addOption(
-          o.id,                      // ID asli
-          o.option_label,
-          o.option_text,
-          correct.includes(o.id)     // true/false
-      );
-  });
+    options.forEach((o, i) => {
+        addOption(
+            o.id,
+            o.option_label,
+            o.option_text,
+            correct.includes(o.id)
+        );
+    });
 };
 
-window.removeOption = function(btn) {
-    const item = btn.closest('.option-item');
-    if (item) item.remove();
+/* =====================================================
+   REMOVE OPTION
+===================================================== */
+window.removeOption = (btn) => {
+    const row = btn.closest(".option-item");
+    if (row) row.remove();
 };
 
-
+/* =====================================================
+   HANDLE CHANGE TIPE SOAL
+===================================================== */
 function handleTypeChange() {
-    
-  const select = document.querySelector(`#${modalId}_form [name="question_type_id"]`);
+    const select = document.querySelector(`#${modalId}_form [name="question_type_id"]`);
+    const typeText = select?.options[select.selectedIndex]?.text?.toLowerCase() ?? "";
 
-  const typeText = select ? select.options[select.selectedIndex].text : null;
-    console.log(typeText);
-    
     const wrapOpt = document.getElementById("wrap_options");
-
     if (!wrapOpt) return;
 
-    if (typeText?.toLowerCase() == "esai") { 
-        // Esai → hide opsi
+    if (typeText === "esai") {
+        // sembunyikan opsi untuk esai
         wrapOpt.style.display = "none";
         document.querySelector("#optionList").innerHTML = "";
     } else {
-        // Pilihan ganda → show opsi
+        // tampilkan opsi untuk pilihan ganda
         wrapOpt.style.display = "block";
 
-        // Jika kosong → tambah minimal 2 opsi
-        if (document.querySelector("#optionList").children.length === 0) {
+        const list = document.querySelector("#optionList");
+        if (list.children.length === 0) {
             addOption();
             addOption();
         }
     }
 }
 
-
-
+$(document).on("change", `#${modalId}_form [name="question_type_id"]`, handleTypeChange);
 
 /* =====================================================
-   FORM SUBMIT
+   SUBMIT FORM
 ===================================================== */
-document.getElementById("{{ $id }}_form").addEventListener("submit", async function(e) {
+document.getElementById(`${modalId}_form`).addEventListener("submit", async (e) => {
     e.preventDefault();
 
-    showLoading(); // ⬅️ TAMBAHKAN DISINI
+    showLoading();
 
-    const url = document.getElementById("{{ $id }}_url").value;
-    const method = document.getElementById("{{ $id }}_method").value;
+    const url = document.getElementById(`${modalId}_url`).value;
+    const method = document.getElementById(`${modalId}_method`).value;
 
-    const formData = new FormData(this);
+    const fd = new FormData(e.target);
+    if (method === "PUT") fd.append("_method", "PUT");
 
-    if (method === "PUT") formData.append("_method", "PUT");
-
-    const response = await fetch(url, {
+    const res = await fetch(url, {
         method: "POST",
         headers: { "Accept": "application/json" },
-        body: formData
-    }).catch(err => {
+        body: fd
+    }).catch(() => {
         hideLoading();
         Swal.fire("Error", "Terjadi kesalahan jaringan!", "error");
     });
 
-    const data = await response.json();
-
-    hideLoading(); // ⬅️ DAN DISINI
-
+    const data = await res.json();
+    hideLoading();
     modal.hide();
 
-    if (data.status == 'success') {
-        Swal.fire("Berhasil", data.message ?? "Data berhasil disimpan!", "success");
+    if (data.status === "success") {
+        Swal.fire("Berhasil", data.message ?? "Data tersimpan", "success");
         $('#{{ $table }}').DataTable().ajax.reload(null, false);
     } else {
-        Swal.fire("Gagal", data.message ?? JSON.stringify(data.errors ?? {}), "error");
+        Swal.fire("Gagal", data.message ?? "Validasi error", "error");
     }
 });
 
-
-$(document).on("change", `#${modalId}_form [name="question_type_id"]`, function () {
-        handleTypeChange();
 });
 
-});
+/* =====================================================
+   LOADING
+===================================================== */
 function showLoading() {
     document.getElementById("btnSubmit").disabled = true;
     document.getElementById("loadingSpinner").classList.remove("d-none");
@@ -481,4 +466,3 @@ function hideLoading() {
 
 </script>
 @endpush
-
