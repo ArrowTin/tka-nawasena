@@ -20,4 +20,5 @@ Route::prefix('su')->group(function(){
     Route::view('/education','master.education_levels.index');
     Route::view('/subject-types','master.subject_types.index');
     Route::get('/subjects',[SubjectController::class,'index']);
+    Route::view('/question-types','master.question_types.index');
 });

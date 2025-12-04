@@ -26,7 +26,8 @@
     :action="url('/api/management/question-types')"
     table="questionTypeTable"
     :fields="[
-        ['type' => 'text', 'label' => 'Nama Jenis Soal', 'name' => 'name', 'col' => 6],
+        ['type' => 'text', 'label' => 'Nama Jenis Soal', 'name' => 'name', 'col' => 12],
+        ['type' => 'textarea', 'label' => 'Deskripsi', 'name' => 'description', 'col' => 12],
     ]"
 />
 
@@ -40,6 +41,7 @@
     :columns="[
         ['data' => 'id', 'title' => 'ID'],
         ['data' => 'name', 'title' => 'Nama Jenis Soal'],
+        ['data' => 'description', 'title' => 'Deskripsi'],
         ['data' => 'id', 'title' => 'Aksi', 'render' => 'actionButtons']
     ]"
     :searchable="[
@@ -66,6 +68,7 @@ document.addEventListener("DOMContentLoaded", () => {
     const columns = [
         { data: 'id' },
         { data: 'name' },
+        { data: 'description' },
         {
             data: 'id',
             orderable: false,

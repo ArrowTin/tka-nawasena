@@ -5,13 +5,32 @@ namespace App\Http\Controllers\Api;
 use App\Models\QuestionType;
 use App\Helpers\ApiResponse;
 use App\Http\Controllers\Controller;
+use App\Services\DataTableBuilder;
 use Illuminate\Http\Request;
 
 class QuestionTypeController extends Controller
 {
-    public function index()
+    public function index(Request $request)
     {
-        return ApiResponse::success(QuestionType::all());
+
+        $builder = new DataTableBuilder(
+            QuestionType::query()
+        );
+
+
+        $sortBy = $request->sort_by ?? 'id';
+      
+
+        $data = $builder
+            ->multiSearch($request->filters ?? [])
+            ->search(['name'], $request->keyword)
+            ->sort($sortBy, $request->sort_dir ?? 'asc')   
+            ->apply(
+                $request->page ?? 1,
+                $request->per_page ?? 10
+            );                                         
+
+        return ApiResponse::success($data);
     }
 
     public function store(Request $request)
