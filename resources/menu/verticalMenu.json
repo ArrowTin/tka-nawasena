@@ -1,6 +1,18 @@
 {
     "menu": [
         {
+            "name": "Bank Soal",
+            "icon": "menu-icon icon-base ti tabler-book",
+            "slug": "su-questions",
+            "submenu": [
+                {
+                    "url": "su/questions",
+                    "name": "Soal",
+                    "slug": "su-questions-dashboard"
+                }
+            ]
+        },
+        {
             "name": "Pengaturan",
             "icon": "menu-icon icon-base ti tabler-settings",
             "slug": "su",

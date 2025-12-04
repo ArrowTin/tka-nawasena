@@ -2,20 +2,50 @@
 
 namespace App\Http\Controllers\Api;
 
-use App\Models\{Question, QuestionOption, QuestionCorrectAnswer};
+use App\Models\{Category, Question, QuestionOption, QuestionCorrectAnswer, QuestionType, Subject};
 use App\Helpers\ApiResponse;
 use App\Http\Controllers\Controller;
+use App\Services\DataTableBuilder;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Storage;
 
 class QuestionController extends Controller
 {
-    public function index()
+    public function index(Request $request)
     {
-        return ApiResponse::success(
-            Question::with(['subject', 'type', 'options', 'correctAnswers'])->get()
-        );
+
+        if (request()->ajax()) {
+            $builder = new DataTableBuilder(
+                Question::query()->with(['subject', 'type', 'options.correctAnswer'])
+            );
+    
+    
+            $sortBy = $request->sort_by ?? 'id';
+          
+    
+            $data = $builder
+                ->multiSearch($request->filters ?? [])
+                ->search(['name'], $request->keyword)
+                ->sort($sortBy, $request->sort_dir ?? 'asc')   
+                ->apply(
+                    $request->page ?? 1,
+                    $request->per_page ?? 10
+                );                                         
+    
+            return ApiResponse::success($data);
+        }
+
+        
+        $subjects = Subject::with('category')
+                    ->get()
+                    ->mapWithKeys(function ($item) {
+                        $label = "{$item->name} - {$item->category->category_name}";
+                        return [$item->id => $label];
+                    });
+        $types    = QuestionType::pluck('name','id');
+    
+        return view('master.questions.index', compact('subjects', 'types'));
     }
 
     public function store(Request $request)
@@ -71,7 +101,7 @@ class QuestionController extends Controller
     public function show(Question $question)
     {
         return ApiResponse::success(
-            $question->load('subject', 'type', 'options', 'correctAnswers')
+            $question->load('subject', 'type', 'options.correctAnswer')
         );
     }
 
@@ -97,33 +127,44 @@ class QuestionController extends Controller
         }
 
         DB::transaction(function () use ($data, $question) {
-            // update question utama
+
             $question->update($data);
-
-            // update options & correct answers jika dikirim
-            if (isset($data['options'])) {
-                // hapus semua option lama & correct answer lama
-                QuestionOption::where('question_id', $question->id)->delete();
-                QuestionCorrectAnswer::where('question_id', $question->id)->delete();
-
-                // buat ulang opsi baru
-                foreach ($data['options'] as $opt) {
-                    $option = QuestionOption::create([
-                        'question_id' => $question->id,
-                        'option_label' => $opt['label'] ?? null,
-                        'option_text' => $opt['text'] ?? null,
-                    ]);
-
-                    if (!empty($data['correct_option_ids']) &&
-                        in_array($opt['label'], $data['correct_option_ids'])) {
+        
+            // Delete old options & correct answers
+            QuestionOption::where('question_id', $question->id)->delete();
+            QuestionCorrectAnswer::where('question_id', $question->id)->delete();
+        
+            $oldToNew = []; // mapping lama → baru
+        
+            foreach ($data['options'] as $opt) {
+        
+                // buat option baru
+                $newOpt = QuestionOption::create([
+                    'question_id' => $question->id,
+                    'option_label' => $opt['label'],
+                    'option_text' => $opt['text'],
+                ]);
+        
+                // simpan mapping id lama → id baru
+                if (isset($opt['id'])) {
+                    $oldToNew[$opt['id']] = $newOpt->id;
+                }
+            }
+        
+            // simpan jawaban benar
+            if (!empty($data['correct_option_ids'])) {
+                foreach ($data['correct_option_ids'] as $oldId) {
+                    if (isset($oldToNew[$oldId])) {
                         QuestionCorrectAnswer::create([
                             'question_id' => $question->id,
-                            'option_id' => $option->id,
+                            'option_id'   => $oldToNew[$oldId],
                         ]);
                     }
                 }
             }
+        
         });
+        
 
         return ApiResponse::success(
             $question->load('options', 'correctAnswers'),

@@ -1,5 +1,6 @@
 <?php
 
+use App\Http\Controllers\Api\QuestionController;
 use App\Http\Controllers\Api\SubjectController;
 use App\Http\Controllers\Tka\UjianController;
 use Illuminate\Support\Facades\Route;
@@ -21,4 +22,5 @@ Route::prefix('su')->group(function(){
     Route::view('/subject-types','master.subject_types.index');
     Route::get('/subjects',[SubjectController::class,'index']);
     Route::view('/question-types','master.question_types.index');
+    Route::get('/questions',[QuestionController::class,'index']);
 });

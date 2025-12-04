@@ -6,8 +6,10 @@
     'relations' => [],
 ])
 
-<div class="modal fade" id="{{ $id }}" tabindex="-1">
-  <div class="modal-dialog modal-lg">
+
+<div class="modal fade" id="{{ $id }}" tabindex="-1"  data-bs-backdrop="static" 
+data-bs-keyboard="false">
+  <div class="modal-dialog modal-lg modal-dialog-scrollable">
     <div class="modal-content">
 
       <div class="modal-header">
@@ -24,53 +26,83 @@
         <input type="hidden" id="{{ $id }}_disable_fields"
                value='@json(collect($fields)->where("disable_on_additem", true)->pluck("name"))'>
 
-        <div class="modal-body row g-3">
+        <div class="modal-body ps-container" style="max-height:70vh; overflow-y:auto;">
+          <div class="row g-3">
 
-          @foreach ($fields as $field)
-            <div class="col-md-{{ $field['col'] ?? 12 }}" data-field="normal">
-              <label class="form-label">{{ $field['label'] }}</label>
 
-              @if ($field['type'] === 'text')
-                <input type="text" class="form-control" name="{{ $field['name'] }}">
-              @endif
-              
+            @foreach ($fields as $field)
+              <div class="col-md-{{ $field['col'] ?? 12 }}" data-field="normal">
+                <label class="form-label">{{ $field['label'] }}</label>
 
-              @if ($field['type'] === 'number')
-                <input type="number" class="form-control" name="{{ $field['name'] }}">
-              @endif
+                @if ($field['type'] === 'text')
+                  <input type="text" class="form-control" name="{{ $field['name'] }}">
+                @endif
 
-              @if ($field['type'] === 'select')
-              <select class="form-select select2" name="{{ $field['name'] }}">
-                  <option value="">— Pilih —</option>
-                  @foreach ($field['options'] ?? [] as $val => $text)
-                    <option value="{{ $val }}">{{ $text }}</option>
-                  @endforeach
-                </select>
-              @endif
+                @if ($field['type'] === 'file')
+                    <input type="file" class="form-control" name="{{ $field['name'] }}">
+                @endif
+                
 
-              @if ($field['type'] === 'textarea')
-                <textarea class="form-control" rows="3" name="{{ $field['name'] }}"></textarea>
-              @endif
-            </div>
-          @endforeach
+                @if ($field['type'] === 'number')
+                  <input type="number" class="form-control" name="{{ $field['name'] }}">
+                @endif
 
-          {{-- RELATIONS — tampil hanya saat openAddItem --}}
-          @foreach ($relations as $relation)
-              <div class="col-12"
-                  id="wrap_{{ \Illuminate\Support\Str::kebab($relation) }}"
-                  data-field="relation"
-                  style="display:none">
+                @if ($field['type'] === 'select')
+                <select class="form-select select2" name="{{ $field['name'] }}">
+                    <option value="">— Pilih —</option>
+                    @foreach ($field['options'] ?? [] as $val => $text)
+                      <option value="{{ $val }}">{{ $text }}</option>
+                    @endforeach
+                  </select>
+                @endif
+
+                @if ($field['type'] === 'textarea')
+                  <textarea class="form-control" rows="3" name="{{ $field['name'] }}"></textarea>
+                @endif
               </div>
-          @endforeach
+            @endforeach
 
+            {{-- RELATIONS — tampil hanya saat openAddItem --}}
+            @foreach ($relations as $name => $relation)
+            {{-- DYNAMIC OPTIONS INPUT --}}
+            @if ($name === 'options')
+                <div class="col-12" id="wrap_options" data-field="relation" style="display:none">
+      
+                    <div class="d-flex justify-content-between mb-2">
+                        <h5>Opsi Jawaban</h5>
+                        <button type="button" class="btn btn-sm btn-primary" onclick="addOption()">Tambah Opsi</button>
+                    </div>
+      
+                    <div id="optionList"></div>
+      
+                    
+                </div>
+                    
+                @else
+                    
+                <div class="col-12"
+                    id="wrap_{{ \Illuminate\Support\Str::kebab($relation) }}"
+                    data-field="relation"
+                    style="display:none">
+                </div>
+                @endif
+
+            @endforeach
+
+        </div>
 
 
         </div>
 
         <div class="modal-footer">
+          <div id="loadingSpinner" class="d-none">
+              <div class="spinner-border text-primary spinner-border-sm me-2"></div>
+              <span>Menyimpan...</span>
+          </div>
+      
           <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Tutup</button>
-          <button type="submit" class="btn btn-primary">Simpan</button>
-        </div>
+          <button type="submit" class="btn btn-primary" id="btnSubmit">Simpan</button>
+      </div>
 
       </form>
 
@@ -111,11 +143,16 @@ window.resetModalCreate = function () {
         .forEach(el => el.style.display = "block");
 
     // sembunyikan field relasi
-    document.querySelectorAll(`#${modalId}_form [data-field="relation"]`)
-        .forEach(el => {
-            el.style.display = "none";
-            el.innerHTML = "";
-        });
+    // sembunyikan field relasi TAPI JANGAN HAPUS STRUKTURNYA
+document.querySelectorAll(`#${modalId}_form [data-field="relation"]`)
+    .forEach(el => {
+        el.style.display = "none";
+
+        // HANYA reset optionList jika ada
+        const list = el.querySelector("#optionList");
+        if (list) list.innerHTML = "";
+    });
+
 
     // reset select2
     setTimeout(() => {
@@ -137,6 +174,27 @@ window.openCreateModal = function (url, title = "Tambah Data") {
     const form = document.getElementById(`${modalId}_form`);
     form.reset();
 
+     // tampilkan opsi
+    const wrapOpt = document.getElementById("wrap_options");
+    if (wrapOpt) wrapOpt.style.display = "block";
+
+    // ============================================
+    // ⬇️ TAMBAHAN PENTING: default 2 opsi
+    // ============================================
+    const optionList = document.getElementById("optionList");
+    if (optionList) {
+        optionList.innerHTML = "";
+        addOption();
+        addOption();
+    }
+    // ============================================
+
+
+    setTimeout(() => {
+        handleTypeChange();
+    }, 200);
+
+
     // reset Select2
     $(`#${modalId} .select2`).val("").trigger("change");
 
@@ -157,9 +215,26 @@ window.openEditModal = async function (url, title = "Edit Data") {
     document.getElementById(`${modalId}_url`).value = url;
     document.getElementById(`${modalId}_method`).value = "PUT";
 
+    setTimeout(() => {
+        handleTypeChange();
+    }, 200);
+
+
     const response = await fetch(url, { headers: { "Accept": "application/json" }});
     const res = await response.json();
     const data = res.payload ?? {};
+
+    // jika ada opsi
+    if (data.options) {
+        document.getElementById("wrap_options").style.display = "block";
+        const correctIds = data.options
+            .filter(o => o.correct_answer !== null)
+            .map(o => o.id);
+
+        fillOptions(data.options, correctIds);
+
+    }
+
 
     // isi field
     Object.keys(data).forEach(key => {
@@ -242,11 +317,121 @@ window.openAddItem = async function(fieldName, fetchUrl, postUrl, selectedItems 
     modal.show();
 };
 
+window.addOption = function(id = null, label = "", text = "", correct = false) {
+    const container = document.getElementById("optionList");
+    if (!container) return;
+
+    const index = container.children.length + 1;
+    const optionId = id ?? `new-${index}`;
+    const labelLetter = label || String.fromCharCode(64 + index);
+
+    container.insertAdjacentHTML(
+        "beforeend",
+        `
+        <div class="border rounded p-2 mb-2 option-item" data-option="${optionId}">
+            <div class="row g-2">
+
+                <input type="hidden" name="options[${index}][id]" value="${id ?? ''}">
+
+                <div class="col-md-2">
+                    <label>Label</label>
+                    <input type="text" class="form-control"
+                        name="options[${index}][label]"
+                        value="${labelLetter}">
+                </div>
+
+                <div class="col-md-7">
+                    <label>Teks Opsi</label>
+                    <input type="text" class="form-control"
+                        name="options[${index}][text]"
+                        value="${text}">
+                </div>
+
+                <div class="col-md-2 d-flex align-items-center">
+                    <div class="form-check mt-3">
+                        <input type="checkbox" class="form-check-input"
+                            name="correct_option_ids[]" value="${optionId}"
+                            ${correct ? "checked" : ""}>
+                        <label class="form-check-label ms-1">Benar?</label>
+                    </div>
+                </div>
+
+                <div class="col-md-1 d-flex align-items-center">
+                    <button type="button" class="btn btn-sm btn-danger mt-3"
+                        onclick="removeOption(this)">
+                        <i class="fa fa-trash"></i>
+                    </button>
+                </div>
+
+            </div>
+        </div>`
+    );
+};
+
+
+
+
+
+    
+    
+// Saat openEditModal memuat data opsi
+window.fillOptions = function(options = [], correct = []) {
+  const wrap = document.getElementById("optionList");
+  wrap.innerHTML = "";
+
+  options.forEach((o, idx) => {
+      addOption(
+          o.id,                      // ID asli
+          o.option_label,
+          o.option_text,
+          correct.includes(o.id)     // true/false
+      );
+  });
+};
+
+window.removeOption = function(btn) {
+    const item = btn.closest('.option-item');
+    if (item) item.remove();
+};
+
+
+function handleTypeChange() {
+    
+  const select = document.querySelector(`#${modalId}_form [name="question_type_id"]`);
+
+  const typeText = select ? select.options[select.selectedIndex].text : null;
+    console.log(typeText);
+    
+    const wrapOpt = document.getElementById("wrap_options");
+
+    if (!wrapOpt) return;
+
+    if (typeText?.toLowerCase() == "esai") { 
+        // Esai → hide opsi
+        wrapOpt.style.display = "none";
+        document.querySelector("#optionList").innerHTML = "";
+    } else {
+        // Pilihan ganda → show opsi
+        wrapOpt.style.display = "block";
+
+        // Jika kosong → tambah minimal 2 opsi
+        if (document.querySelector("#optionList").children.length === 0) {
+            addOption();
+            addOption();
+        }
+    }
+}
+
+
+
+
 /* =====================================================
    FORM SUBMIT
 ===================================================== */
 document.getElementById("{{ $id }}_form").addEventListener("submit", async function(e) {
     e.preventDefault();
+
+    showLoading(); // ⬅️ TAMBAHKAN DISINI
 
     const url = document.getElementById("{{ $id }}_url").value;
     const method = document.getElementById("{{ $id }}_method").value;
@@ -259,9 +444,15 @@ document.getElementById("{{ $id }}_form").addEventListener("submit", async funct
         method: "POST",
         headers: { "Accept": "application/json" },
         body: formData
+    }).catch(err => {
+        hideLoading();
+        Swal.fire("Error", "Terjadi kesalahan jaringan!", "error");
     });
 
     const data = await response.json();
+
+    hideLoading(); // ⬅️ DAN DISINI
+
     modal.hide();
 
     if (data.status == 'success') {
@@ -272,7 +463,22 @@ document.getElementById("{{ $id }}_form").addEventListener("submit", async funct
     }
 });
 
+
+$(document).on("change", `#${modalId}_form [name="question_type_id"]`, function () {
+        handleTypeChange();
 });
+
+});
+function showLoading() {
+    document.getElementById("btnSubmit").disabled = true;
+    document.getElementById("loadingSpinner").classList.remove("d-none");
+}
+
+function hideLoading() {
+    document.getElementById("btnSubmit").disabled = false;
+    document.getElementById("loadingSpinner").classList.add("d-none");
+}
+
 </script>
 @endpush
 
