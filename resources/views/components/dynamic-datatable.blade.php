@@ -42,7 +42,7 @@
 
 
 
-@push('page-script')
+@push('script')
 <script>
     function initDynamicDatatable(id, api, columns) {
 
@@ -53,12 +53,15 @@
                 url: api,
                 type: "GET",
                 data: function (d) {
+
+                    let col = d.columns[d.order[0].column] ?? {};
+
                     return {
                         page: (d.start / d.length) + 1,
                         per_page: d.length,
-                        sort_by: d.columns[d.order[0].column].data,
+                        sort_by: col.data ?? null,
                         sort_dir: d.order[0].dir,
-                        keyword: d.search.value,  
+                        keyword: d.search.value,
                         filters: $('#' + id + '_search_form .dt-input').map(function () {
                             return {
                                 column: $(this).data('filter'),
@@ -68,21 +71,21 @@
                     };
                 },
                 dataSrc: function (json) {
-                    json.recordsTotal = json.payload.total;
-                    json.recordsFiltered = json.payload.total;
-                    return json.payload.data;
+                    json.recordsTotal = json.payload?.total ?? 0;
+                    json.recordsFiltered = json.payload?.total ?? 0;
+                    return json.payload?.data ?? [];
                 }
             },
             columns: columns
         });
 
-        // Reload saat pengguna mengetik
         $('#' + id + '_search_form .dt-input').on('keyup change', function () {
             dt.ajax.reload();
         });
 
         return dt;
     }
+
 
 </script>
 @endpush

@@ -35,6 +35,7 @@
         ['data' => 'id', 'title' => 'ID'],
         ['data' => 'name', 'title' => 'Nama'],
         ['data' => 'educationLevels', 'title' => 'Tingkat Sekolah', 'render' => 'listNames'],
+        ['data' => 'educationLevels', 'title' => 'Filter (hidden)'],
         ['data' => 'id', 'title' => 'Aksi', 'render' => 'actionButtons']
     ]"
     :searchable="[
@@ -45,11 +46,10 @@
 
 @endsection
 
-@section('page-script')
+@push('script')
 
 <script src="{{asset('js/crud-helper.js')}}"></script>
 
-@stack('page-script')
 
 
 <script>
@@ -96,7 +96,7 @@
         initDynamicDatatable("subjectTypeTable", apiUrl.index, columns);
     });
 </script>
-@endsection
+@endpush
 
 
 

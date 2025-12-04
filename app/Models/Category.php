@@ -11,6 +11,17 @@ class Category extends Model
 {
     protected $fillable = ['education_level_id', 'subject_type_id'];
 
+    protected $appends = ['category_name'];
+
+
+    public function getCategoryNameAttribute()
+    {
+        return ($this->educationLevel->name ?? '-') 
+        . ' - ' . 
+          ($this->subjectType->name ?? '-');
+    }
+
+
     public function subjects(): HasMany
     {
         return $this->hasMany(Subject::class, 'category_id');

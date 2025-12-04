@@ -1,5 +1,6 @@
 <?php
 
+use App\Http\Controllers\Api\SubjectController;
 use App\Http\Controllers\Tka\UjianController;
 use Illuminate\Support\Facades\Route;
 
@@ -18,4 +19,5 @@ Route::get('template', function () {
 Route::prefix('su')->group(function(){
     Route::view('/education','master.education_levels.index');
     Route::view('/subject-types','master.subject_types.index');
+    Route::get('/subjects',[SubjectController::class,'index']);
 });

@@ -35,6 +35,7 @@
         ['data' => 'id', 'title' => 'ID'],
         ['data' => 'name', 'title' => 'Nama'],
         ['data' => 'subjectTypes', 'title' => 'Jenis Mata Pelajaran', 'render' => 'listNames'],
+        ['data' => 'subjectTypes', 'title' => 'Filter JP (hidden)'],
         ['data' => 'id', 'title' => 'Aksi', 'render' => 'actionButtons']
     ]"
     :searchable="[
@@ -45,11 +46,10 @@
 
 @endsection
 
-@section('page-script')
+@push('script')
 
 <script src="{{asset('js/crud-helper.js')}}"></script>
 
-@stack('page-script')
 
 
 <script>
@@ -97,7 +97,7 @@
         initDynamicDatatable("educationLevelTable", apiUrl.index, columns);
     });
 </script>
-@endsection
+@endpush
 
 
 

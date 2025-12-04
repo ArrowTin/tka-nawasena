@@ -30,6 +30,17 @@ class DataTableBuilder
 
             $column = $f['column'];
 
+            // FILTER: category.name (gabungan educationLevel + subjectType)
+            if ($column === 'category.name') {
+                $this->query->whereHas('category.educationLevel', function ($q) use ($value) {
+                    $q->where('name', 'LIKE', "%{$value}%");
+                })->orWhereHas('category.subjectType', function ($q) use ($value) {
+                    $q->where('name', 'LIKE', "%{$value}%");
+                });
+
+                continue;
+            }
+
             // Filtering relasi: subjectTypes.name
             if (str_contains($column, '.')) {
 
@@ -97,99 +108,113 @@ class DataTableBuilder
      * contoh: subjectTypes.name
      */
     public function sort(?string $column, string $direction = 'asc')
-{
-    if (!$column || is_numeric($column)) {
+    {
+        if (!$column || is_numeric($column)) {
+            return $this;
+        }
+
+        // SORT: category.category_name (gabungan educationLevel + subjectType)
+        if ($column === 'category.category_name') {
+
+            $this->query
+                ->leftJoin('categories', 'categories.id', 'subjects.category_id')
+                ->leftJoin('education_levels', 'education_levels.id', 'categories.education_level_id')
+                ->leftJoin('subject_types', 'subject_types.id', 'categories.subject_type_id')
+                ->select('subjects.*')
+                ->orderBy('education_levels.name', $direction)
+                ->orderBy('subject_types.name', $direction);
+
+            return $this;
+        }
+
+        // Jika kolom relasi, contoh: subjectTypes.name
+        if (str_contains($column, '.')) {
+
+            [$relationName, $field] = explode('.', $column);
+
+            $model = $this->query->getModel();
+
+            if (!method_exists($model, $relationName)) {
+                return $this;
+            }
+
+            $relation = $model->$relationName();
+            $related = $relation->getRelated();
+            $relatedTable = $related->getTable();
+            $parentTable = $model->getTable();
+
+            /**
+             * ===============
+             * BELONGS TO
+             * ===============
+             */
+            if ($relation instanceof \Illuminate\Database\Eloquent\Relations\BelongsTo) {
+
+                $foreignKey = $relation->getForeignKeyName();
+                $ownerKey   = $relation->getOwnerKeyName();
+
+                $this->query
+                    ->leftJoin($relatedTable, "{$relatedTable}.{$ownerKey}", "{$parentTable}.{$foreignKey}")
+                    ->select("{$parentTable}.*")
+                    ->selectRaw("{$relatedTable}.{$field} AS sort_value")
+                    ->orderBy('sort_value', $direction);
+
+                return $this;
+            }
+
+            /**
+             * ===============
+             * HAS ONE / MANY
+             * ===============
+             */
+            if ($relation instanceof \Illuminate\Database\Eloquent\Relations\HasOne ||
+                $relation instanceof \Illuminate\Database\Eloquent\Relations\HasMany ||
+                $relation instanceof \Illuminate\Database\Eloquent\Relations\MorphMany) {
+
+                $foreignKey = $relation->getForeignKeyName();
+                $localKey   = $relation->getLocalKeyName();
+
+                $this->query
+                    ->leftJoin($relatedTable, "{$relatedTable}.{$foreignKey}", "{$parentTable}.{$localKey}")
+                    ->select("{$parentTable}.*")
+                    ->selectRaw("{$relatedTable}.{$field} AS sort_value")
+                    ->orderBy("sort_value", $direction)
+                    ->distinct();
+
+                return $this;
+            }
+
+            /**
+             * ================================
+             * BELONGS TO MANY (PIVOT TABLE)
+             * ================================
+             */
+            if ($relation instanceof \Illuminate\Database\Eloquent\Relations\BelongsToMany ||
+                $relation instanceof \Illuminate\Database\Eloquent\Relations\MorphToMany) {
+
+                $pivotTable      = $relation->getTable(); // pivot
+                $foreignPivotKey = $relation->getForeignPivotKeyName();
+                $relatedPivotKey = $relation->getRelatedPivotKeyName();
+                $parentKey       = $relation->getParentKeyName();
+                $relatedKey      = $relation->getRelatedKeyName();
+
+                $this->query
+                    ->leftJoin("{$pivotTable} as pivot", "pivot.{$foreignPivotKey}", "{$parentTable}.{$parentKey}")
+                    ->leftJoin("{$relatedTable} as rel", "rel.{$relatedKey}", "pivot.{$relatedPivotKey}")
+                    ->select("{$parentTable}.*")
+                    ->selectRaw("rel.{$field} AS sort_value")   // **FIX UTAMA**
+                    ->orderBy("sort_value", $direction)
+                    ->distinct();
+
+                return $this;
+            }
+        }
+
+        // Sorting kolom biasa
+        $this->query->orderBy($column, $direction);
+
         return $this;
     }
-
-    // Jika kolom relasi, contoh: subjectTypes.name
-    if (str_contains($column, '.')) {
-
-        [$relationName, $field] = explode('.', $column);
-
-        $model = $this->query->getModel();
-
-        if (!method_exists($model, $relationName)) {
-            return $this;
-        }
-
-        $relation = $model->$relationName();
-        $related = $relation->getRelated();
-        $relatedTable = $related->getTable();
-        $parentTable = $model->getTable();
-
-        /**
-         * ===============
-         * BELONGS TO
-         * ===============
-         */
-        if ($relation instanceof \Illuminate\Database\Eloquent\Relations\BelongsTo) {
-
-            $foreignKey = $relation->getForeignKeyName();
-            $ownerKey   = $relation->getOwnerKeyName();
-
-            $this->query
-                ->leftJoin($relatedTable, "{$relatedTable}.{$ownerKey}", "{$parentTable}.{$foreignKey}")
-                ->select("{$parentTable}.*")
-                ->selectRaw("{$relatedTable}.{$field} AS sort_value")
-                ->orderBy('sort_value', $direction);
-
-            return $this;
-        }
-
-        /**
-         * ===============
-         * HAS ONE / MANY
-         * ===============
-         */
-        if ($relation instanceof \Illuminate\Database\Eloquent\Relations\HasOne ||
-            $relation instanceof \Illuminate\Database\Eloquent\Relations\HasMany ||
-            $relation instanceof \Illuminate\Database\Eloquent\Relations\MorphMany) {
-
-            $foreignKey = $relation->getForeignKeyName();
-            $localKey   = $relation->getLocalKeyName();
-
-            $this->query
-                ->leftJoin($relatedTable, "{$relatedTable}.{$foreignKey}", "{$parentTable}.{$localKey}")
-                ->select("{$parentTable}.*")
-                ->selectRaw("{$relatedTable}.{$field} AS sort_value")
-                ->orderBy("sort_value", $direction)
-                ->distinct();
-
-            return $this;
-        }
-
-        /**
-         * ================================
-         * BELONGS TO MANY (PIVOT TABLE)
-         * ================================
-         */
-        if ($relation instanceof \Illuminate\Database\Eloquent\Relations\BelongsToMany ||
-            $relation instanceof \Illuminate\Database\Eloquent\Relations\MorphToMany) {
-
-            $pivotTable      = $relation->getTable(); // pivot
-            $foreignPivotKey = $relation->getForeignPivotKeyName();
-            $relatedPivotKey = $relation->getRelatedPivotKeyName();
-            $parentKey       = $relation->getParentKeyName();
-            $relatedKey      = $relation->getRelatedKeyName();
-
-            $this->query
-                ->leftJoin("{$pivotTable} as pivot", "pivot.{$foreignPivotKey}", "{$parentTable}.{$parentKey}")
-                ->leftJoin("{$relatedTable} as rel", "rel.{$relatedKey}", "pivot.{$relatedPivotKey}")
-                ->select("{$parentTable}.*")
-                ->selectRaw("rel.{$field} AS sort_value")   // **FIX UTAMA**
-                ->orderBy("sort_value", $direction)
-                ->distinct();
-
-            return $this;
-        }
-    }
-
-    // Sorting kolom biasa
-    $this->query->orderBy($column, $direction);
-
-    return $this;
-}
 
 
 
