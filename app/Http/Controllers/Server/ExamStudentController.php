@@ -22,7 +22,7 @@ class ExamStudentController extends Controller
     {
         $request->validate([
             'exam_id' => 'required|exists:exams,id',
-            'user_id' => 'required|exists:students,user_id',
+            'user_id' => 'required|',
             'is_active' => 'sometimes|boolean',
         ]);
 
@@ -33,7 +33,7 @@ class ExamStudentController extends Controller
                 'user_id'   => $request->user_id,
             ]);
         }
-        
+
         $isActive = $request->input('is_active', true);
 
         $examStudent = ExamStudent::where('exam_id', $examId)->where('student_id', $student->id)->first();
