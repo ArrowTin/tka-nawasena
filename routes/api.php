@@ -54,7 +54,8 @@ Route::prefix('student')->middleware('student.jwt')->group(function () {
 // ----------------------
 // SERVER
 // ----------------------
+// 'service.jwt'
 // Route::middleware('service.jwt')->get('/exams', [ExamStudentController::class, 'exams']);
-Route::middleware('service.jwt')->post('/exams/add-student', [ExamStudentController::class, 'addStudent']);
-Route::middleware('service.jwt')->post('/exams/toggle-student-status', [ExamStudentController::class, 'toggleStudentStatus']);
+Route::middleware([])->post('/exams/add-student', [ExamStudentController::class, 'addStudent']);
+Route::middleware([])->post('/exams/toggle-student-status', [ExamStudentController::class, 'toggleStudentStatus']);
 
