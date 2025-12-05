@@ -28,6 +28,12 @@ class ExamStudentController extends Controller
 
         $examId = $request->exam_id;
         $student = Student::where('user_id',$request->user_id)->first();
+        if (!$student) {
+            $student = Student::create([
+                'user_id'   => $request->user_id,
+            ]);
+        }
+        
         $isActive = $request->input('is_active', true);
 
         $examStudent = ExamStudent::where('exam_id', $examId)->where('student_id', $student->id)->first();
