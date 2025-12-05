@@ -39,7 +39,8 @@ Route::prefix('management')->middleware([])->group(function () {
 // ----------------------
 // SISWA
 // ----------------------
-Route::prefix('student')->middleware('student.jwt')->group(function () {
+// 'student.jwt'
+Route::prefix('student')->middleware([])->group(function () {
     Route::get('exams', [StudentController::class, 'listExams']);
     Route::get('exams/{exam}', [StudentController::class, 'examDetail']);
     Route::post('exams/{exam}/start', [StudentController::class, 'startExam']);
