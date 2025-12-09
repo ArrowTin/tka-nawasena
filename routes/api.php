@@ -31,6 +31,8 @@ Route::prefix('management')->middleware([])->group(function () {
     Route::apiResource('question-types', QuestionTypeController::class);
     Route::apiResource('questions', QuestionController::class);
     Route::apiResource('exams', ExamController::class);
+    Route::get('exams/{exam}/questions', [ExamController::class,'questions']);
+    Route::post('exams/{exam}/add-questions', [ExamController::class,'syncQuestion']);
 
     // Tambah & Hapus soal dalam ujian
     Route::post('exams/{exam}/sync-questions', [ExamController::class, 'syncQuestion']);

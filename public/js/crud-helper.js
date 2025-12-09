@@ -62,7 +62,7 @@ window.CRUD = {
             </button>
 
             <button class="btn btn-danger btn-sm"
-                onclick="CRUD.confirmDelete('${api.delete(row.id)}', '${row.name}', '${row.table}')">
+                onclick="CRUD.confirmDelete('${api.delete(row.id)}', '${ row.table ==='examTable'? row.title: row.name}', '${row.table}')">
                 Hapus
             </button>
         `;

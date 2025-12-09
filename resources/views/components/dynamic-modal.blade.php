@@ -41,6 +41,9 @@ data-bs-keyboard="false">
                 @if ($field['type'] === 'file')
                     <input type="file" class="form-control" name="{{ $field['name'] }}">
                 @endif
+                @if ($field['type'] === 'datetime_local')
+                    <input type="datetime-local" class="form-control" name="{{ $field['name'] }}">
+                @endif
                 
 
                 @if ($field['type'] === 'number')
@@ -81,7 +84,7 @@ data-bs-keyboard="false">
                 @else
                     
                 <div class="col-12"
-                    id="wrap_{{ \Illuminate\Support\Str::kebab($relation) }}"
+                    id="wrap_{{ \Illuminate\Support\Str::kebab($name) }}"
                     data-field="relation"
                     style="display:none">
                 </div>
@@ -153,6 +156,8 @@ function toKebab(str) {
    RESET MODAL
 ===================================================== */
 window.resetModalCreate = function () {
+
+    document.getElementById("btnSubmit").style.display = "blok";
 
     // tampilkan elemen normal
     document.querySelectorAll(`#${modalId}_form [data-field="normal"]`)
@@ -267,6 +272,8 @@ window.openEditModal = async function (url, title = "Edit Data") {
     document.getElementById(`${modalId}_url`).value = postUrl;
     document.getElementById(`${modalId}_method`).value = "POST";
 
+
+
     // Sembunyikan field normal
     document.querySelectorAll(`#${modalId}_form [data-field="normal"]`)
         .forEach(el => el.style.display = "none");
@@ -301,7 +308,7 @@ window.openEditModal = async function (url, title = "Edit Data") {
                        value="${row.id}"
                        ${selected.includes(row.id) ? "checked" : ""}>
                 <label class="form-check-label">
-                    ${row.name}
+                    ${fieldName ==='questions' ? row.question_text : row.name}
                 </label>
             </div>
         `;
@@ -310,7 +317,61 @@ window.openEditModal = async function (url, title = "Edit Data") {
     modal.show();
 };
 
+window.openViewItem = async function (
+    fieldName,
+    fetchUrl,
+    postUrl = null,
+    selectedItems = [],
+    title = "Lihat Data"
+) {
+    resetModalCreate();
 
+    // Set judul modal
+    document.getElementById(`${modalId}_title`).innerText = title;
+
+    // Sembunyikan tombol submit karena ini hanya view
+    document.getElementById("btnSubmit").style.display = "none";
+
+    // Sembunyikan field normal
+    document.querySelectorAll(`#${modalId}_form [data-field="normal"]`).forEach(el => el.style.display = "none");
+
+    // Wrapper untuk field relasi
+    const wrapId = `wrap_${toKebab(fieldName)}`;
+    const wrap = document.getElementById(wrapId);
+    if (!wrap) return;
+
+    wrap.style.display = "block";
+    wrap.innerHTML = "Loading...";
+
+    // Fetch data soal dari server
+    const response = await fetch(fetchUrl, { headers: { "Accept": "application/json" } });
+    const res = await response.json();
+    const list = res.payload ?? [];
+
+    wrap.innerHTML = "";
+
+    list.forEach(q => {
+        const optionsHtml = q.options?.map(o => {
+            const isCorrect = o.correct_answer !== null;
+            return `<li style="color:${isCorrect ? 'green' : 'inherit'}">
+                        ${o.option_label}. ${o.option_text}
+                    </li>`;
+        }).join("") ?? "";
+
+        wrap.innerHTML += `
+            <div class="card mb-2">
+                <div class="card-body">
+                    <strong>Soal:</strong> ${q.question_text}<br/>
+                    ${q.question_image ? `<img src="{{asset('storage')}}/${q.question_image}" class="img-fluid my-1"/>` : ""}
+                    <ul class="mt-2">${optionsHtml}</ul>
+                    ${q.explanation ? `<small><strong>Pembahasan:</strong> ${q.explanation}</small>` : ""}
+                </div>
+            </div>
+        `;
+    });
+
+    modal.show();
+};
 /* =====================================================
    ADD OPTION INPUT
 ===================================================== */

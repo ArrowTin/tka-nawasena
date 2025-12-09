@@ -10,7 +10,14 @@
                     "name": "Soal",
                     "slug": "su-questions-dashboard"
                 }
+            
             ]
+        },
+        {
+            "url": "exams",
+            "name": "Ujian",
+            "icon": "menu-icon icon-base ti tabler-smart-home",
+            "slug": "exams"
         },
         {
             "name": "Pengaturan",

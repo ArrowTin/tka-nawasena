@@ -1,5 +1,6 @@
 <?php
 
+use App\Http\Controllers\Api\ExamController;
 use App\Http\Controllers\Api\QuestionController;
 use App\Http\Controllers\Api\SubjectController;
 use App\Http\Controllers\Tka\UjianController;
@@ -23,4 +24,5 @@ Route::prefix('su')->group(function(){
     Route::get('/subjects',[SubjectController::class,'index']);
     Route::view('/question-types','master.question_types.index');
     Route::get('/questions',[QuestionController::class,'index']);
+    Route::get('/exams',[ExamController::class,'index']);
 });
