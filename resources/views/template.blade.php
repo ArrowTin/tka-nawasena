@@ -1,198 +1,149 @@
 @extends('layouts/layoutMaster')
 
-@section('title', 'Template - TKA Nawasena')
-
-@section('page-style')
-    @vite(['resources/assets/vendor/fonts/fontawesome.scss'])
-@endsection
+@section('title', 'Dashboard')
 
 @section('content')
-    <!-- Basic Bootstrap Table -->
-    <div class="card">
-        <h5 class="card-header">Table Basic</h5>
-        <div class="table-responsive text-nowrap">
-            <table class="table">
-                <thead>
-                    <tr>
-                        <th>Project</th>
-                        <th>Client</th>
-                        <th>Users</th>
-                        <th>Status</th>
-                        <th>Actions</th>
-                    </tr>
-                </thead>
-                <tbody class="table-border-bottom-0">
-                    <tr>
-                        <td>
-                            <i class="icon-base ti tabler-brand-angular icon-md text-danger me-4"></i>
-                            <span class="fw-medium">Angular Project</span>
-                        </td>
-                        <td>Albert Cook</td>
-                        <td>
-                            <ul class="list-unstyled m-0 avatar-group d-flex align-items-center">
-                                <li data-bs-toggle="tooltip" data-popup="tooltip-custom" data-bs-placement="top"
-                                    class="avatar avatar-xs pull-up" title="Lilian Fuller">
-                                    <img src="{{ asset('assets/img/avatars/5.png') }}" alt="Avatar"
-                                        class="rounded-circle" />
-                                </li>
-                                <li data-bs-toggle="tooltip" data-popup="tooltip-custom" data-bs-placement="top"
-                                    class="avatar avatar-xs pull-up" title="Sophia Wilkerson">
-                                    <img src="{{ asset('assets/img/avatars/6.png') }}" alt="Avatar"
-                                        class="rounded-circle" />
-                                </li>
-                                <li data-bs-toggle="tooltip" data-popup="tooltip-custom" data-bs-placement="top"
-                                    class="avatar avatar-xs pull-up" title="Christina Parker">
-                                    <img src="{{ asset('assets/img/avatars/7.png') }}" alt="Avatar"
-                                        class="rounded-circle" />
-                                </li>
-                            </ul>
-                        </td>
-                        <td><span class="badge bg-label-primary me-1">Active</span></td>
-                        <td>
-                            <div class="dropdown">
-                                <button type="button" class="btn p-0 dropdown-toggle hide-arrow" data-bs-toggle="dropdown">
-                                    <i class="icon-base ti tabler-dots-vertical"></i>
-                                </button>
-                                <div class="dropdown-menu">
-                                    <a class="dropdown-item" href="javascript:void(0);"><i
-                                            class="icon-base ti tabler-pencil me-1"></i>
-                                        Edit</a>
-                                    <a class="dropdown-item" href="javascript:void(0);"><i
-                                            class="icon-base ti tabler-trash me-1"></i>
-                                        Delete</a>
-                                </div>
-                            </div>
-                        </td>
-                    </tr>
-                    <tr>
-                        <td><i class="icon-base ti tabler-brand-react-native icon-md text-info me-4"></i> <span
-                                class="fw-medium">React Project</span></td>
-                        <td>Barry Hunter</td>
-                        <td>
-                            <ul class="list-unstyled m-0 avatar-group d-flex align-items-center">
-                                <li data-bs-toggle="tooltip" data-popup="tooltip-custom" data-bs-placement="top"
-                                    class="avatar avatar-xs pull-up" title="Lilian Fuller">
-                                    <img src="{{ asset('assets/img/avatars/5.png') }}" alt="Avatar"
-                                        class="rounded-circle" />
-                                </li>
-                                <li data-bs-toggle="tooltip" data-popup="tooltip-custom" data-bs-placement="top"
-                                    class="avatar avatar-xs pull-up" title="Sophia Wilkerson">
-                                    <img src="{{ asset('assets/img/avatars/6.png') }}" alt="Avatar"
-                                        class="rounded-circle" />
-                                </li>
-                                <li data-bs-toggle="tooltip" data-popup="tooltip-custom" data-bs-placement="top"
-                                    class="avatar avatar-xs pull-up" title="Christina Parker">
-                                    <img src="{{ asset('assets/img/avatars/7.png') }}" alt="Avatar"
-                                        class="rounded-circle" />
-                                </li>
-                            </ul>
-                        </td>
-                        <td><span class="badge bg-label-success me-1">Completed</span></td>
-                        <td>
-                            <div class="dropdown">
-                                <button type="button" class="btn p-0 dropdown-toggle hide-arrow" data-bs-toggle="dropdown">
-                                    <i class="icon-base ti tabler-dots-vertical"></i>
-                                </button>
-                                <div class="dropdown-menu">
-                                    <a class="dropdown-item" href="javascript:void(0);"><i
-                                            class="icon-base ti tabler-pencil me-2"></i>
-                                        Edit</a>
-                                    <a class="dropdown-item" href="javascript:void(0);"><i
-                                            class="icon-base ti tabler-trash me-2"></i>
-                                        Delete</a>
-                                </div>
-                            </div>
-                        </td>
-                    </tr>
-                    <tr>
-                        <td>
-                            <i class="icon-base ti tabler-brand-vue icon-md text-success me-4"></i>
-                            <span class="fw-medium">VueJs Project</span>
-                        </td>
-                        <td>Trevor Baker</td>
-                        <td>
-                            <ul class="list-unstyled m-0 avatar-group d-flex align-items-center">
-                                <li data-bs-toggle="tooltip" data-popup="tooltip-custom" data-bs-placement="top"
-                                    class="avatar avatar-xs pull-up" title="Lilian Fuller">
-                                    <img src="{{ asset('assets/img/avatars/5.png') }}" alt="Avatar"
-                                        class="rounded-circle" />
-                                </li>
-                                <li data-bs-toggle="tooltip" data-popup="tooltip-custom" data-bs-placement="top"
-                                    class="avatar avatar-xs pull-up" title="Sophia Wilkerson">
-                                    <img src="{{ asset('assets/img/avatars/6.png') }}" alt="Avatar"
-                                        class="rounded-circle" />
-                                </li>
-                                <li data-bs-toggle="tooltip" data-popup="tooltip-custom" data-bs-placement="top"
-                                    class="avatar avatar-xs pull-up" title="Christina Parker">
-                                    <img src="{{ asset('assets/img/avatars/7.png') }}" alt="Avatar"
-                                        class="rounded-circle" />
-                                </li>
-                            </ul>
-                        </td>
-                        <td><span class="badge bg-label-info me-1">Scheduled</span></td>
-                        <td>
-                            <div class="dropdown">
-                                <button type="button" class="btn p-0 dropdown-toggle hide-arrow"
-                                    data-bs-toggle="dropdown">
-                                    <i class="icon-base ti tabler-dots-vertical"></i>
-                                </button>
-                                <div class="dropdown-menu">
-                                    <a class="dropdown-item" href="javascript:void(0);"><i
-                                            class="icon-base ti tabler-pencil me-2"></i>
-                                        Edit</a>
-                                    <a class="dropdown-item" href="javascript:void(0);"><i
-                                            class="icon-base ti tabler-trash me-2"></i>
-                                        Delete</a>
-                                </div>
-                            </div>
-                        </td>
-                    </tr>
-                    <tr>
-                        <td>
-                            <i class="icon-base ti tabler-brand-bootstrap icon-md text-primary me-4"></i>
-                            <span class="fw-medium">Bootstrap Project</span>
-                        </td>
-                        <td>Jerry Milton</td>
-                        <td>
-                            <ul class="list-unstyled m-0 avatar-group d-flex align-items-center">
-                                <li data-bs-toggle="tooltip" data-popup="tooltip-custom" data-bs-placement="top"
-                                    class="avatar avatar-xs pull-up" title="Lilian Fuller">
-                                    <img src="{{ asset('assets/img/avatars/5.png') }}" alt="Avatar"
-                                        class="rounded-circle" />
-                                </li>
-                                <li data-bs-toggle="tooltip" data-popup="tooltip-custom" data-bs-placement="top"
-                                    class="avatar avatar-xs pull-up" title="Sophia Wilkerson">
-                                    <img src="{{ asset('assets/img/avatars/6.png') }}" alt="Avatar"
-                                        class="rounded-circle" />
-                                </li>
-                                <li data-bs-toggle="tooltip" data-popup="tooltip-custom" data-bs-placement="top"
-                                    class="avatar avatar-xs pull-up" title="Christina Parker">
-                                    <img src="{{ asset('assets/img/avatars/7.png') }}" alt="Avatar"
-                                        class="rounded-circle" />
-                                </li>
-                            </ul>
-                        </td>
-                        <td><span class="badge bg-label-warning me-1">Pending</span></td>
-                        <td>
-                            <div class="dropdown">
-                                <button type="button" class="btn p-0 dropdown-toggle hide-arrow"
-                                    data-bs-toggle="dropdown">
-                                    <i class="icon-base ti tabler-dots-vertical"></i>
-                                </button>
-                                <div class="dropdown-menu">
-                                    <a class="dropdown-item" href="javascript:void(0);"><i
-                                            class="icon-base ti tabler-pencil me-2"></i>
-                                        Edit</a>
-                                    <a class="dropdown-item" href="javascript:void(0);"><i
-                                            class="icon-base ti tabler-trash me-2"></i>
-                                        Delete</a>
-                                </div>
-                            </div>
-                        </td>
-                    </tr>
-                </tbody>
-            </table>
+<div class="container">
+
+    <!-- ====================== FILTER ====================== -->
+    <div class="card mb-4">
+        <div class="card-header fw-bold">Filter Data</div>
+        <div class="card-body">
+            <form method="GET">
+                <div class="row g-3">
+
+                    <div class="col-md-3">
+                        <label>Kategori</label>
+                        <select name="category_id" class="form-control">
+                            <option value="">Semua</option>
+                            @foreach($categories as $c)
+                                <option value="{{ $c->id }}" {{ request('category_id') == $c->id ? 'selected':'' }}>
+                                    {{ $c->category_name }}
+                                </option>
+                            @endforeach
+                        </select>
+                    </div>
+
+                    <div class="col-md-3">
+                        <label>Mata Pelajaran</label>
+                        <select name="subject_id" class="form-control">
+                            <option value="">Semua</option>
+                            @foreach($subjects as $s)
+                                <option value="{{ $s->id }}" {{ request('subject_id') == $s->id ? 'selected':'' }}>
+                                    {{ $s->name }}
+                                </option>
+                            @endforeach
+                        </select>
+                    </div>
+
+                    <div class="col-md-3">
+                        <label>Tanggal Mulai</label>
+                        <input type="date" name="date_start" value="{{ request('date_start') }}" class="form-control">
+                    </div>
+
+                    <div class="col-md-3">
+                        <label>Tanggal Selesai</label>
+                        <input type="date" name="date_end" value="{{ request('date_end') }}" class="form-control">
+                    </div>
+
+                </div>
+
+                <div class="mt-3">
+                    <button class="btn btn-primary">Terapkan Filter</button>
+                    <a href="{{ route('su.beranda') }}" class="btn btn-secondary">Reset</a>
+                </div>
+            </form>
         </div>
     </div>
-    <!--/ Basic Bootstrap Table -->
+
+    <!-- ====================== STATISTIK ====================== -->
+    <div class="row mb-4">
+        <div class="col-md-3">
+            <div class="card text-center p-3 shadow-sm">
+                <h6 class="text-muted">Total Ujian</h6>
+                <h2>{{ $totalUjian }}</h2>
+            </div>
+        </div>
+
+        <div class="col-md-3">
+            <div class="card text-center p-3 shadow-sm">
+                <h6 class="text-muted">Total Soal</h6>
+                <h2>{{ $totalSoal }}</h2>
+            </div>
+        </div>
+
+        <div class="col-md-3">
+            <div class="card text-center p-3 shadow-sm">
+                <h6 class="text-muted">Total Attempts</h6>
+                <h2>{{ $totalAttempts }}</h2>
+            </div>
+        </div>
+
+        <div class="col-md-3">
+            <div class="card text-center p-3 shadow-sm">
+                <h6 class="text-muted">Rata-Rata Soal/Ujian</h6>
+                <h2>{{ $avgQuestions }}</h2>
+            </div>
+        </div>
+    </div>
+
+    <!-- ====================== CHART 1 ====================== -->
+    <div class="card mb-4 shadow-sm">
+        <div class="card-header fw-bold">Jumlah Soal per Ujian</div>
+        <div class="card-body">
+            <canvas id="chartQuestions"></canvas>
+        </div>
+    </div>
+
+    <!-- ====================== CHART 2 ====================== -->
+    <div class="card mb-4 shadow-sm">
+        <div class="card-header fw-bold">Jumlah Attempt per Ujian</div>
+        <div class="card-body">
+            <canvas id="chartAttempts"></canvas>
+        </div>
+    </div>
+</div>
 @endsection
+
+@push('script')
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+
+<script>
+    const labels = @json($chartLabels);
+    const dataQuestions = @json($chartData);
+    const dataAttempts = @json($chartAttempts);
+
+    // ===== Chart Jumlah Soal =====
+    new Chart(document.getElementById('chartQuestions'), {
+        type: 'bar',
+        data: {
+            labels: labels,
+            datasets: [{
+                label: 'Jumlah Soal',
+                data: dataQuestions,
+            }]
+        }
+    });
+
+    // ===== Chart Attempts =====
+    new Chart(document.getElementById('chartAttempts'), {
+        type: 'line',
+        data: {
+            labels: labels,
+            datasets: [{
+                label: 'Total Attempt',
+                data: dataAttempts,
+                fill: true,
+            }]
+        }
+    });
+</script>
+<script>
+    const token = new URLSearchParams(window.location.search).get("token");
+    console.log(token);
+    
+    if (token) {
+        localStorage.setItem("api_token", token);
+    }
+</script>
+@endpush

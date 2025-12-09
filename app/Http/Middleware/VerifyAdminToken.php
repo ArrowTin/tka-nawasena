@@ -42,7 +42,7 @@ class VerifyAdminToken
             return $next($request);
         }
 
-        return ApiResponse::error('Kamu Bukan Super visor',301);
+        return ApiResponse::error('Kamu Bukan Super visor',403);
 
     }
 

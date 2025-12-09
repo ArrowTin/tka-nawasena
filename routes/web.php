@@ -3,6 +3,7 @@
 use App\Http\Controllers\Api\ExamController;
 use App\Http\Controllers\Api\QuestionController;
 use App\Http\Controllers\Api\SubjectController;
+use App\Http\Controllers\HomeController;
 use App\Http\Controllers\Tka\UjianController;
 use Illuminate\Support\Facades\Route;
 
@@ -19,6 +20,8 @@ Route::get('template', function () {
 
 
 Route::prefix('su')->group(function(){
+    Route::get('/beranda',[HomeController::class,'index'])->name('su.beranda');
+    Route::get('/red',[HomeController::class,'red']);
     Route::view('/education','master.education_levels.index');
     Route::view('/subject-types','master.subject_types.index');
     Route::get('/subjects',[SubjectController::class,'index']);
