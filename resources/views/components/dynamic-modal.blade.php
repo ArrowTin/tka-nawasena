@@ -157,7 +157,7 @@ function toKebab(str) {
 ===================================================== */
 window.resetModalCreate = function () {
 
-    document.getElementById("btnSubmit").style.display = "blok";
+    document.getElementById("btnSubmit").style.display = "block";
 
     // tampilkan elemen normal
     document.querySelectorAll(`#${modalId}_form [data-field="normal"]`)
