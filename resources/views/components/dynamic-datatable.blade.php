@@ -45,13 +45,16 @@
 @push('script')
 <script>
     function initDynamicDatatable(id, api, columns) {
-
+        const token = window.API_TOKEN || localStorage.getItem("api_token");
         let dt = $('#' + id).DataTable({
             processing: true,
             serverSide: true,
             ajax: {
                 url: api,
                 type: "GET",
+                headers: {
+                    "Authorization": "Bearer " + token
+                },
                 data: function (d) {
 
                     let col = d.columns[d.order[0].column] ?? {};

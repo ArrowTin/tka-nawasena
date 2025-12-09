@@ -24,7 +24,7 @@
     :fields="[
         ['type' => 'text', 'label' => 'Nama Tingkat', 'name' => 'name', 'col' => 12],
     ]"
-    :relations="['subjectTypes']"
+    :relations="['subjectTypes'=>[]]"
 />
 
 <x-dynamic-datatable 

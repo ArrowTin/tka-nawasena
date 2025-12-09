@@ -63,3 +63,26 @@
 <!-- Page scripts -->
 @yield('page-script')
 @stack('script')
+
+<script>
+  const token = window.API_TOKEN || localStorage.getItem("api_token");
+
+  if (!token) {
+    window.location.href = "{{url('/')}}";
+  }
+
+  document.addEventListener("click", function (e) {
+    const target = e.target.closest("a");
+
+    if (!target) return;
+
+    // Jika link mengarah ke /su/red
+    if (target.getAttribute("href") === "{{url('su/red')}}") {
+        
+        // Hapus localStorage
+        localStorage.removeItem("api_token");
+
+    }
+});
+
+</script>

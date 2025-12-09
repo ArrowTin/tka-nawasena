@@ -46,7 +46,7 @@
             ]
         },
         {
-            "url": "red",
+            "url": "su/red",
             "name": "Kembali Ke Nawasena",
             "icon": "menu-icon icon-base ti tabler-refresh",
             "slug": "red"

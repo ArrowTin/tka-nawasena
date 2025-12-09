@@ -139,11 +139,10 @@
     });
 </script>
 <script>
-    const token = new URLSearchParams(window.location.search).get("token");
-    console.log(token);
+    const tkn = new URLSearchParams(window.location.search).get("token");
     
-    if (token) {
-        localStorage.setItem("api_token", token);
+    if (tkn) {
+        localStorage.setItem("api_token", tkn);
     }
 </script>
 @endpush

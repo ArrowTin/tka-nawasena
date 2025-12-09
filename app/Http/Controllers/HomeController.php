@@ -62,6 +62,6 @@ class HomeController extends Controller
 
     public function red()
     {
-        return redirect()->away(env('NAWASENA_APP').'/admin/dashboard');
+        return redirect()->away(env('NAWASENA_APP').'/operator/dashboard');
     }
 }

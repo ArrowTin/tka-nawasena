@@ -204,7 +204,7 @@ document.addEventListener("DOMContentLoaded", () => {
         document.getElementById(`${modalId}_url`).value = url;
         document.getElementById(`${modalId}_method`).value = "PUT";
 
-        const res = await fetch(url, { headers: { "Accept": "application/json" } });
+        const res = await await apiFetch(url);
         const json = await res.json();
         const data = json.payload ?? {};
 
@@ -241,7 +241,7 @@ document.addEventListener("DOMContentLoaded", () => {
        OPEN RELATION MODAL
     ===================================================== */
     window.openAddItem = async function (fieldName, fetchUrl, postUrl, selectedItems = [], title = "Pilih Relasi") {
-
+        
         resetModalCreate();
 
         document.getElementById(`${modalId}_title`).innerText = title;
@@ -254,12 +254,13 @@ document.addEventListener("DOMContentLoaded", () => {
 
         const wrapId = `wrap_${toKebab(fieldName)}`;
         const wrap = document.getElementById(wrapId);
+        
         if (!wrap) return;
 
         wrap.style.display = "block";
         wrap.innerHTML = "Loading...";
 
-        const response = await fetch(fetchUrl, { headers: { "Accept": "application/json" } });
+        const response = await apiFetch(fetchUrl);
         const res = await response.json();
         const list = res.payload ?? [];
 
@@ -306,7 +307,7 @@ document.addEventListener("DOMContentLoaded", () => {
         wrap.style.display = "block";
         wrap.innerHTML = "Loading...";
 
-        const response = await fetch(fetchUrl, { headers: { "Accept": "application/json" } });
+        const response = await apiFetch(fetchUrl);
         const res = await response.json();
         const list = res.payload ?? [];
 
@@ -443,7 +444,7 @@ document.addEventListener("DOMContentLoaded", () => {
         const fd = new FormData(e.target);
         if (method === "PUT") fd.append("_method", "PUT");
 
-        const res = await fetch(url, {
+        const res = await apiFetch(url, {
             method: "POST",
             headers: { "Accept": "application/json" },
             body: fd

@@ -18,7 +18,7 @@ use Illuminate\Support\Facades\Route;
 // MANAGEMENT (ADMIN/TEACHER)
 // ----------------------
 // 'supervisor.jwt'
-Route::prefix('management')->middleware([])->group(function () {
+Route::prefix('management')->middleware(['supervisor.jwt'])->group(function () {
 
     Route::get('education-levels/subject-types', [EducationLevelController::class,'subjectTypes']);
     Route::post('education-levels/{id}/add-subject-types', [EducationLevelController::class,'addSubjectType']);
@@ -42,7 +42,7 @@ Route::prefix('management')->middleware([])->group(function () {
 // SISWA
 // ----------------------
 // 'student.jwt'
-Route::prefix('student')->middleware([])->group(function () {
+Route::prefix('student')->middleware(['student.jwt'])->group(function () {
     Route::get('exams', [StudentController::class, 'listExams']);
     Route::get('exams/{exam}', [StudentController::class, 'examDetail']);
     Route::post('exams/{exam}/start', [StudentController::class, 'startExam']);
