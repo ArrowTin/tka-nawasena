@@ -115,7 +115,7 @@ class QuestionController extends Controller
             'explanation' => 'nullable|string',
             'difficulty' => 'in:easy,medium,hard',
             'options' => 'nullable|array',
-            'correct_option_ids' => 'nullable|array'
+            'correct_option_ids' => 'nullable|array'  // ← label array ("A", "B")
         ]);
 
         // Update gambar jika ada yang baru
@@ -129,49 +129,49 @@ class QuestionController extends Controller
         DB::transaction(function () use ($data, $question) {
 
             $question->update($data);
-        
-            // Delete old options & correct answers
+
+            // Hapus semua opsi & jawaban benar lama
             QuestionOption::where('question_id', $question->id)->delete();
             QuestionCorrectAnswer::where('question_id', $question->id)->delete();
-        
-            $oldToNew = []; // mapping lama → baru
+
+            $labelToNewId = []; // label → NEW id
+
             if (!empty($data['options'])) {
                 foreach ($data['options'] as $opt) {
-            
-                    // buat option baru
+
+                    // buat opsi baru
                     $newOpt = QuestionOption::create([
-                        'question_id' => $question->id,
-                        'option_label' => $opt['label'],
-                        'option_text' => $opt['text'],
+                        'question_id'  => $question->id,
+                        'option_label' => $opt['label'],   // contoh: "A"
+                        'option_text'  => $opt['text'],
                     ]);
-            
-                    // simpan mapping id lama → id baru
-                    if (isset($opt['id'])) {
-                        $oldToNew[$opt['id']] = $newOpt->id;
-                    }
+
+                    // simpan mapping label → id
+                    $labelToNewId[$opt['label']] = $newOpt->id;
                 }
             }
-        
-            // simpan jawaban benar
+
+            // simpan jawaban benar berdasarkan LABEL
             if (!empty($data['correct_option_ids'])) {
-                foreach ($data['correct_option_ids'] as $oldId) {
-                    if (isset($oldToNew[$oldId])) {
+                foreach ($data['correct_option_ids'] as $label) {
+
+                    if (isset($labelToNewId[$label])) {
                         QuestionCorrectAnswer::create([
                             'question_id' => $question->id,
-                            'option_id'   => $oldToNew[$oldId],
+                            'option_id'   => $labelToNewId[$label],
                         ]);
                     }
                 }
             }
-        
+
         });
-        
 
         return ApiResponse::success(
             $question->load('options', 'correctAnswers'),
             'Question updated successfully'
         );
     }
+
 
     public function destroy(Question $question)
     {

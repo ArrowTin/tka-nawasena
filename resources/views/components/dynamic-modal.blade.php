@@ -347,28 +347,38 @@ document.addEventListener("DOMContentLoaded", () => {
 
         const index = container.children.length + 1;
 
-        const optionId = id ?? `new-${index}`;
+        // Label A, B, C...
         const labelLetter = label || String.fromCharCode(64 + index);
 
         container.insertAdjacentHTML("beforeend", `
-            <div class="border rounded p-2 mb-2 option-item" data-option="${optionId}">
+            <div class="border rounded p-2 mb-2 option-item" data-option="${id ?? 'new-'+index}">
                 <div class="row g-2">
 
                     <input type="hidden" name="options[${index}][id]" value="${id ?? ''}">
 
                     <div class="col-md-2">
                         <label>Label</label>
-                        <input type="text" class="form-control" name="options[${index}][label]" value="${labelLetter}">
+                        <input type="text" class="form-control" 
+                            name="options[${index}][label]" 
+                            value="${labelLetter}">
                     </div>
 
                     <div class="col-md-7">
                         <label>Teks Opsi</label>
-                        <input type="text" class="form-control" name="options[${index}][text]" value="${text}">
+                        <input type="text" class="form-control" 
+                            name="options[${index}][text]" 
+                            value="${text}">
                     </div>
 
                     <div class="col-md-2 d-flex align-items-center">
                         <div class="form-check mt-3">
-                            <input type="checkbox" class="form-check-input" name="correct_option_ids[]" value="${id ?? ''}" ${correct ? "checked" : ""}>
+
+                            <!-- FIX: value harus LABEL -->
+                            <input type="checkbox"
+                                class="form-check-input correct-option"
+                                name="correct_option_ids[]"
+                                value="${labelLetter}"
+                                ${correct ? "checked" : ""}>
                             <label class="form-check-label ms-1">Benar?</label>
                         </div>
                     </div>
@@ -383,6 +393,8 @@ document.addEventListener("DOMContentLoaded", () => {
             </div>
         `);
     };
+
+
 
     /* =====================================================
        FILL OPTIONS (EDIT)
