@@ -8,8 +8,8 @@ return new class extends Migration {
     public function up(): void {
         Schema::create('exams', function (Blueprint $table) {
             $table->id();
-            $table->foreignId('category_id')->nullable()->constrained('categories')->onDelete('cascade');
-            $table->foreignId('subject_id')->constrained('subjects')->onDelete('set null');
+            $table->foreignId('category_id')->nullable()->constrained('categories')->onDelete('set null');
+            $table->foreignId('subject_id')->constrained('subjects')->onDelete('cascade');
             $table->string('title', 150);
             $table->text('description')->nullable();
             $table->integer('duration_minutes');
