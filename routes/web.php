@@ -7,9 +7,7 @@ use App\Http\Controllers\HomeController;
 use App\Http\Controllers\Tka\UjianController;
 use Illuminate\Support\Facades\Route;
 
-Route::get('/', function () {
-    return view('welcome');
-});
+Route::view('/','welcome');
 
 Route::get('tka', [UjianController::class, 'index'])->name('tka.index');
 Route::get('template', function () {
