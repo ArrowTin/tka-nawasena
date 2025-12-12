@@ -24,8 +24,8 @@
     :action="url('/api/management/questions')"
     table="questionTable"
     :fields="[
-        ['type'=>'select','label'=>'Mata Pelajaran', 'name'=>'subject_id','options'=>$subjects,'col'=>6,'required'=>'required'],
-        ['type'=>'select','label'=>'Tipe Soal', 'name'=>'question_type_id','options'=>$types,'col'=>6, 'required'=>'required'],
+        ['type'=>'select','label'=>'Mata Pelajaran', 'name'=>'subject_id','options'=>$subjects,'col'=>6,'required'=>true],
+        ['type'=>'select','label'=>'Tipe Soal', 'name'=>'question_type_id','options'=>$types,'col'=>6, 'required'=>true],
         ['type'=>'textarea','label'=>'Teks Soal', 'name'=>'question_text','col'=>12],
         ['type'=>'file','label'=>'Gambar Soal', 'name'=>'question_image','col'=>12],
         ['type'=>'textarea','label'=>'Pembahasan', 'name'=>'explanation','col'=>12],

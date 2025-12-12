@@ -34,23 +34,23 @@
                                 <label class="form-label">{{ $field['label'] }}</label>
 
                                 @if ($field['type'] === 'text')
-                                    <input type="text" class="form-control" name="{{ $field['name'] }}" {{$field['required']}}>
+                                    <input type="text" class="form-control" name="{{ $field['name'] }}" @if($field['required']) required @endif>
                                 @endif
 
                                 @if ($field['type'] === 'file')
-                                    <input type="file" class="form-control" name="{{ $field['name'] }}" {{$field['required']}}>
+                                    <input type="file" class="form-control" name="{{ $field['name'] }}" @if($field['required']) required @endif>
                                 @endif
 
                                 @if ($field['type'] === 'datetime_local')
-                                    <input type="datetime-local" class="form-control" name="{{ $field['name'] }}" {{$field['required']}}>
+                                    <input type="datetime-local" class="form-control" name="{{ $field['name'] }}" @if($field['required']) required @endif>
                                 @endif
 
                                 @if ($field['type'] === 'number')
-                                    <input type="number" class="form-control" name="{{ $field['name'] }}" {{$field['required']}}>
+                                    <input type="number" class="form-control" name="{{ $field['name'] }}" @if($field['required']) required @endif>
                                 @endif
 
                                 @if ($field['type'] === 'select')
-                                    <select class="form-select select2" name="{{ $field['name'] }}" {{$field['required']}}>
+                                    <select class="form-select select2" name="{{ $field['name'] }}" @if($field['required']) required @endif>
                                         <option value="">— Pilih —</option>
                                         @foreach (($field['options'] ?? []) as $val => $text)
                                             <option value="{{ $val }}">{{ $text }}</option>
