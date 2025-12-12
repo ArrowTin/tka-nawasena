@@ -34,23 +34,23 @@
                                 <label class="form-label">{{ $field['label'] }}</label>
 
                                 @if ($field['type'] === 'text')
-                                    <input type="text" class="form-control" name="{{ $field['name'] }}">
+                                    <input type="text" class="form-control" name="{{ $field['name'] }}" {{$field['required']}}>
                                 @endif
 
                                 @if ($field['type'] === 'file')
-                                    <input type="file" class="form-control" name="{{ $field['name'] }}">
+                                    <input type="file" class="form-control" name="{{ $field['name'] }}" {{$field['required']}}>
                                 @endif
 
                                 @if ($field['type'] === 'datetime_local')
-                                    <input type="datetime-local" class="form-control" name="{{ $field['name'] }}">
+                                    <input type="datetime-local" class="form-control" name="{{ $field['name'] }}" {{$field['required']}}>
                                 @endif
 
                                 @if ($field['type'] === 'number')
-                                    <input type="number" class="form-control" name="{{ $field['name'] }}">
+                                    <input type="number" class="form-control" name="{{ $field['name'] }}" {{$field['required']}}>
                                 @endif
 
                                 @if ($field['type'] === 'select')
-                                    <select class="form-select select2" name="{{ $field['name'] }}">
+                                    <select class="form-select select2" name="{{ $field['name'] }}" {{$field['required']}}>
                                         <option value="">— Pilih —</option>
                                         @foreach (($field['options'] ?? []) as $val => $text)
                                             <option value="{{ $val }}">{{ $text }}</option>
@@ -59,7 +59,7 @@
                                 @endif
 
                                 @if ($field['type'] === 'textarea')
-                                    <textarea class="form-control" rows="3" name="{{ $field['name'] }}"></textarea>
+                                    <textarea class="form-control" rows="3" name="{{ $field['name'] }}" ></textarea>
                                 @endif
                             </div>
                         @endforeach
