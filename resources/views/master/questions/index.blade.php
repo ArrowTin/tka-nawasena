@@ -30,7 +30,7 @@
         ['type'=>'file','label'=>'Gambar Soal', 'name'=>'question_image','col'=>12],
         ['type'=>'textarea','label'=>'Pembahasan', 'name'=>'explanation','col'=>12],
         ['type'=>'select','label'=>'Tingkat Kesulitan', 'name'=>'difficulty',
-            'options'=>['easy'=>'Mudah','medium'=>'Sedang','hard'=>'Sulit'], 'col'=>6],
+            'options'=>['easy'=>'Mudah','medium'=>'Sedang','hard'=>'Sulit'], 'col'=>6,'required'=>true],
     ]"
     :relations="[
         'options' => [
