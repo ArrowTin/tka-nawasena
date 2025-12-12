@@ -72,19 +72,31 @@ class QuestionController extends Controller
         DB::transaction(function () use ($data, &$question) {
             $question = Question::create($data);
 
+            $labelToNewId = []; // label → NEW id
+
             if (!empty($data['options'])) {
                 foreach ($data['options'] as $opt) {
-                    $option = QuestionOption::create([
-                        'question_id' => $question->id,
-                        'option_label' => $opt['label'] ?? null,
-                        'option_text' => $opt['text'] ?? null,
+
+                    // buat opsi baru
+                    $newOpt = QuestionOption::create([
+                        'question_id'  => $question->id,
+                        'option_label' => $opt['label'],   // contoh: "A"
+                        'option_text'  => $opt['text'],
                     ]);
 
-                    if (!empty($data['correct_option_ids']) &&
-                        in_array($opt['label'], $data['correct_option_ids'])) {
+                    // simpan mapping label → id
+                    $labelToNewId[$opt['label']] = $newOpt->id;
+                }
+            }
+
+            // simpan jawaban benar berdasarkan LABEL
+            if (!empty($data['correct_option_ids'])) {
+                foreach ($data['correct_option_ids'] as $label) {
+
+                    if (isset($labelToNewId[$label])) {
                         QuestionCorrectAnswer::create([
                             'question_id' => $question->id,
-                            'option_id' => $option->id,
+                            'option_id'   => $labelToNewId[$label],
                         ]);
                     }
                 }
