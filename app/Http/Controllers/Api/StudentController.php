@@ -292,6 +292,7 @@ class StudentController extends Controller
         }
 
         $questions = ExamQuestion::with([
+            'question.type',
             'question.options',
             'question.correctAnswers',
         ])->where('exam_id', $attempt->exam_id)->get();
@@ -299,6 +300,7 @@ class StudentController extends Controller
         $review = $questions->map(function ($eq) use ($attempt) {
             $answer = $attempt->answers->where('question_id', $eq->question->id)->first();
             return [
+                'type' => $eq->question->type->name,
                 'question' => $eq->question->question_text,
                 'options' => $eq->question->options,
                 'correct' => $eq->question->correctAnswers->pluck('option_id'),
