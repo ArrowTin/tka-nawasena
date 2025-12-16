@@ -164,6 +164,14 @@ class StudentController extends Controller
         $selected = $data['selected_option_ids'] ?? [];
         $answerText = $data['answer_text'] ?? null;
 
+        if (count($selected) > 1 && $question->type->name == 'Pilihan ganda') {
+            return response()->json([
+                'code' => 400,
+                'status' => 'gagal',
+                'message'   => 'opsi jawaban lebih dari satu'
+            ]);
+        }
+
         // Cek kebenaran
         $correctOptionIds = $question->correctAnswers()->pluck('option_id')->toArray();
         $isCorrect = false;
