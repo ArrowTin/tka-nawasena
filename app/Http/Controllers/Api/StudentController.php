@@ -313,6 +313,7 @@ class StudentController extends Controller
                 'options' => $eq->question->options,
                 'correct' => $eq->question->correctAnswers->pluck('option_id'),
                 'student_answer' => $answer ? json_decode($answer->selected_option_ids, true) : null,
+                'answer_text' => $answer ? $answer->answer_text : null,
                 'is_correct' => $answer ? $answer->is_correct : null,
                 'explanation' => $eq->question->explanation
             ];
